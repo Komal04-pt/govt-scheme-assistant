@@ -22,6 +22,7 @@ html, body {
   box-sizing: border-box;
 }
 
+/* ================= NAVIGATION & TABS ================= */
 nav {
   display: flex;
   overflow-x: auto !important;
@@ -39,39 +40,16 @@ nav::-webkit-scrollbar {
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
+.nav-link:hover {
+  color: #f8fafc;
+}
 .nav-link.active {
-  color: #ffffff !important;
+  color: #34d399 !important;
   border-bottom-color: #34d399 !important;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-/* Category Filter Buttons - Active State Overrides */
-.category-btn,
-.cat-filter-btn,
-.filter-btn,
-button[data-category] {
-  background-color: #f1f5f9 !important;
-  color: #475569 !important;
-  border: 1px solid #e2e8f0 !important;
-  padding: 8px 16px !important;
-  border-radius: 20px !important;
-  font-size: 13px !important;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-}
-
-.category-btn.active,
-.cat-filter-btn.active,
-.filter-btn.active,
-button[data-category].active,
-.cat-filter-btn.bg-emerald-800,
-.cat-filter-btn.bg-emerald-600 {
-  background-color: #059669 !important;
-  color: #ffffff !important;
-  border-color: #059669 !important;
-  font-weight: 700 !important;
-}
-
+/* Page Section visibility */
 .page-section {
   display: none;
 }
@@ -79,6 +57,35 @@ button[data-category].active,
   display: block;
 }
 
+/* ================= CATEGORY FILTER BUTTONS ================= */
+/* Default State for all filter buttons */
+.cat-filter-btn,
+.category-btn,
+.filter-btn {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #e2e8f0 !important;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Active State Only: Sirf wahi button green hoga jise click/select kiya gaya hai */
+.cat-filter-btn.active,
+.category-btn.active,
+.filter-btn.active,
+.active-cat {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+  font-weight: 700 !important;
+}
+
+/* State Portal Active Card */
+.state-btn.active-state {
+  border-color: #059669 !important;
+  background-color: #ecfdf5 !important;
+}
+
+/* ================= CHAT & AI WORKSTATION ================= */
 .chat-scroll::-webkit-scrollbar {
   width: 5px;
 }
@@ -87,50 +94,7 @@ button[data-category].active,
   border-radius: 4px;
 }
 
-/* AI Assistant Input Bar & Send Button Mobile Alignment */
-.chat-input-container,
-#page-assistant form,
-.chat-footer-bar {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 8px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  padding: 8px 10px !important;
-  background-color: #ffffff !important;
-}
-
-.chat-input-container input,
-#page-assistant input[type="text"] {
-  flex: 1 1 auto !important;
-  min-width: 0 !important;
-  height: 42px !important;
-  box-sizing: border-box !important;
-  border-radius: 12px !important;
-  border: 1px solid #cbd5e1 !important;
-  padding: 0 12px !important;
-  font-size: 13px !important;
-}
-
-.chat-send-btn,
-#page-assistant button[type="submit"],
-#sendBtn {
-  flex-shrink: 0 !important;
-  width: 42px !important;
-  height: 42px !important;
-  min-width: 42px !important;
-  border-radius: 50% !important;
-  background-color: #059669 !important;
-  color: #ffffff !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border: none !important;
-  cursor: pointer !important;
-}
-
+/* Message Formatting */
 .msg-content ul {
   list-style-type: disc;
   margin-left: 1.2rem;
@@ -151,17 +115,18 @@ button[data-category].active,
   color: #0f172a;
 }
 
+/* Scheme Card Hover Effect */
 .scheme-card {
   transition: all 0.2s ease-in-out;
 }
 .scheme-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
   border-color: #10b981;
 }
 
 @media (max-width: 640px) {
-  #page-assistant > div {
-    height: calc(100vh - 160px) !important;
+  #page-ai > div {
+    height: calc(100vh - 140px) !important;
   }
 }
