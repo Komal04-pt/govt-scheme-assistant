@@ -15,6 +15,7 @@ from voice import transcribe_audio, synthesize_speech
 
 app = FastAPI(title="JanSeva AI Assistant")
 
+# Add CORS Middleware for production deployments
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,6 +24,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Custom Middleware to force-disable static asset caching across mobile & desktop browsers
+@app.middleware("http")
+async def add_no_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/static") or request.url.path.endswith(".json"):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
+
+# In-memory session store
 SESSIONS = {}
 
 STATE_MAP = {

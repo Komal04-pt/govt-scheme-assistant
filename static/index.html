@@ -14,8 +14,8 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Custom External CSS -->
-  <link rel="stylesheet" href="/static/style.css">
+  <!-- Custom External CSS (With Version Query for Cache Bypass) -->
+  <link rel="stylesheet" href="/static/style.css?v=10.0">
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col">
 
@@ -333,7 +333,7 @@
     </div>
   </div>
 
-  <!-- External Script File -->
-  <script src="/static/script.js"></script>
+  <!-- External Script File (With Version Query for Cache Bypass) -->
+  <script src="/static/script.js?v=10.0" defer></script>
 </body>
 </html>

@@ -11,6 +11,20 @@ const quickRepliesEl = document.getElementById('quickReplies');
 
 const DEFAULT_QUICK_REPLIES = ['Bihar Student Credit Card', 'PM Kisan Scheme', 'Old Age Pension Eligibility'];
 
+// State Code & Name Mapping Matrix
+const STATE_LOOKUP = {
+  'BR': ['BR', 'BIHAR'],
+  'RJ': ['RJ', 'RAJASTHAN'],
+  'UP': ['UP', 'UTTAR PRADESH'],
+  'MP': ['MP', 'MADHYA PRADESH'],
+  'DL': ['DL', 'DELHI'],
+  'MH': ['MH', 'MAHARASHTRA'],
+  'KA': ['KA', 'KARNATAKA'],
+  'WB': ['WB', 'WEST BENGAL']
+};
+
+const CENTRAL_KEYWORDS = ['CENTRAL', 'ALL', 'ALL INDIA', 'NATIONAL', 'INDIA'];
+
 function getBookmarks() {
   try {
     return JSON.parse(localStorage.getItem('janseva_bookmarks') || '[]');
@@ -92,6 +106,19 @@ function onGlobalStateChange() {
   renderCatalog();
 }
 
+function isSchemeMatchState(scheme, targetStateCode) {
+  if (!targetStateCode || targetStateCode === 'ALL') return true;
+
+  const rawLocation = (scheme.eligibility?.location || scheme.state || 'CENTRAL').toString().toUpperCase().trim();
+
+  // 1. Central / National schemes always included
+  if (CENTRAL_KEYWORDS.includes(rawLocation)) return true;
+
+  // 2. Exact match on state code or state full name
+  const validNames = STATE_LOOKUP[targetStateCode] || [targetStateCode.toUpperCase()];
+  return validNames.some(val => rawLocation.includes(val) || val.includes(rawLocation));
+}
+
 function buildSchemeCardHtml(scheme, styleVariant, searchVal = '') {
   const badgeClass = styleVariant === 'state'
     ? 'text-[9px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded'
@@ -142,9 +169,7 @@ function renderCatalog() {
       return isBookmarked(s.id);
     }
 
-    const sState = (s.eligibility?.location || s.state || 'CENTRAL').toUpperCase();
-    const targetState = currentGlobalState.toUpperCase();
-    const matchState = (targetState === 'ALL') || (sState === 'CENTRAL') || (sState === targetState);
+    const matchState = isSchemeMatchState(s, currentGlobalState);
     
     let matchCat = (currentCatalogCat === 'ALL');
     if (!matchCat) {
@@ -187,13 +212,11 @@ function setCatalogCat(cat, btnElement) {
 
   const buttons = document.querySelectorAll('.cat-filter-btn, .category-btn');
   buttons.forEach(btn => {
-    btn.classList.remove('active', 'bg-emerald-800', 'bg-emerald-600', 'text-white');
-    btn.classList.add('bg-slate-100', 'text-slate-600');
+    btn.classList.remove('active');
   });
 
   if (btnElement) {
-    btnElement.classList.remove('bg-slate-100', 'text-slate-600');
-    btnElement.classList.add('active', 'bg-emerald-600', 'text-white');
+    btnElement.classList.add('active');
   }
 
   renderCatalog();
@@ -237,22 +260,15 @@ function selectStatePortal(stateCode) {
     'KA': 'Karnataka', 'WB': 'West Bengal' 
   };
   
-  const targetStateName = (stateNames[stateCode] || stateCode).toLowerCase();
   const titleEl = document.getElementById('statePortalTitle');
-  if (titleEl) titleEl.innerText = `${stateNames[stateCode] || stateCode} Schemes`;
+  if (titleEl) titleEl.innerText = `${stateNames[stateCode] || stateCode} & Central Schemes`;
 
-  const stateSchemes = SCHEMES_DATABASE.filter(s => {
-    const sStateRaw = (s.eligibility?.location || s.state || 'CENTRAL').toString().toLowerCase();
-    return sStateRaw === stateCode.toLowerCase() || 
-           sStateRaw === targetStateName || 
-           sStateRaw === 'central' || 
-           sStateRaw === 'all india' || 
-           sStateRaw === 'all';
-  });
+  // Always combines State Schemes + Central Schemes
+  const stateSchemes = SCHEMES_DATABASE.filter(s => isSchemeMatchState(s, stateCode));
 
   container.innerHTML = '';
   if (stateSchemes.length === 0) {
-    container.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-400 py-10">No schemes found for this state.</p>`;
+    container.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-400 py-10">No schemes found for this selection.</p>`;
     return;
   }
 
@@ -263,52 +279,6 @@ function selectStatePortal(stateCode) {
     card.innerHTML = buildSchemeCardHtml(scheme, 'state');
     container.appendChild(card);
   });
-}
-
-function getRealisticDocuments(scheme) {
-  const rawDocs = scheme.documents_required || scheme.documents;
-  if (Array.isArray(rawDocs) && rawDocs.length >= 4) {
-    return rawDocs;
-  }
-
-  const category = (scheme.category || '').toLowerCase();
-  
-  if (category.includes('financial') || category.includes('pension') || category.includes('inclusion')) {
-    return [
-      "Aadhaar Card (Mandatory Identity & Address Proof)",
-      "PAN Card / Form 60",
-      "Active Bank Account Passbook (Aadhaar Seeded)",
-      "2 Recent Passport Size Photographs",
-      "Mobile Number linked with Aadhaar",
-      "Income / Caste Certificate (If applying under quota)"
-    ];
-  } else if (category.includes('agri') || category.includes('farmer')) {
-    return [
-      "Aadhaar Card (Identity Proof)",
-      "Land Record / Khatauni Copy (Land ownership proof)",
-      "Bank Passbook Details with IFSC Code",
-      "Aadhaar-seeded Mobile Number",
-      "Self-Declaration / Farmer Registration Card"
-    ];
-  } else if (category.includes('youth') || category.includes('edu')) {
-    return [
-      "Aadhaar Card of Applicant & Guardian",
-      "Educational Marksheets (10th / 12th / Degree)",
-      "Income Certificate issued by Tehsildar/SDM",
-      "State Domicile / Residence Certificate",
-      "Institution Admission Fee Receipt & Bonafide Certificate",
-      "Bank Account Details"
-    ];
-  } else {
-    return [
-      "Aadhaar Card (Identity & Address Proof)",
-      "Residence / Domicile Certificate",
-      "Income Certificate (Family Annual Income)",
-      "Bank Account Passbook Copy",
-      "Passport Size Photographs (2 Copies)",
-      "Active Mobile Number & Email ID"
-    ];
-  }
 }
 
 function openModal(schemeId) {
@@ -323,12 +293,10 @@ function openModal(schemeId) {
   const title = scheme.name || scheme.title || "Government Scheme";
   const desc = scheme.description || scheme.desc || "";
   const benefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
-  const applySteps = scheme.how_to_apply || scheme.eligibility_desc || "Visit official portal or nearest Jan Seva Kendra / Bank Mitra.";
+  const applySteps = scheme.how_to_apply || scheme.eligibility_desc || "Visit official portal or nearest Jan Seva Kendra.";
 
   const applyUrl = scheme.apply_url || `https://www.google.com/search?q=${encodeURIComponent(title + " official portal apply online")}`;
   const bookmarked = isBookmarked(scheme.id);
-
-  const docsList = getRealisticDocuments(scheme);
 
   if (modalContent) {
     modalContent.innerHTML = `
@@ -350,12 +318,6 @@ function openModal(schemeId) {
 
       <div class="space-y-3 text-xs text-slate-700">
         <p><strong>Application Guide:</strong> ${applySteps}</p>
-        <div>
-          <p class="font-bold text-slate-800 mb-1">Mandatory Documents Required:</p>
-          <ul class="list-disc pl-4 text-slate-600 space-y-1">
-            ${docsList.map(doc => `<li>${doc}</li>`).join('')}
-          </ul>
-        </div>
       </div>
 
       <div class="mt-5 flex flex-col sm:flex-row gap-2">
@@ -363,7 +325,7 @@ function openModal(schemeId) {
           Ask AI Assistant
         </button>
         <a href="${applyUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-slate-900 hover:bg-slate-800 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-1">
-          Apply on Official Portal ↗
+          Apply Official Portal ↗
         </a>
       </div>
     `;
@@ -426,33 +388,23 @@ async function toggleRecording() {
   if (!isRecording) {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      let options = {};
-      if (MediaRecorder.isTypeSupported('audio/webm')) {
-        options = { mimeType: 'audio/webm' };
-      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-        options = { mimeType: 'audio/mp4' };
-      }
+      let options = MediaRecorder.isTypeSupported('audio/webm') ? { mimeType: 'audio/webm' } : {};
 
       mediaRecorder = new MediaRecorder(stream, options);
       audioChunks = [];
 
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) {
-          audioChunks.push(e.data);
-        }
+        if (e.data && e.data.size > 0) audioChunks.push(e.data);
       };
 
       mediaRecorder.onstop = () => {
-        const mimeType = mediaRecorder.mimeType || 'audio/webm';
-        const audioBlob = new Blob(audioChunks, { type: mimeType });
-        
+        const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
         stream.getTracks().forEach(track => track.stop());
 
         if (audioBlob.size > 1500) {
           sendVoiceMessage(audioBlob);
         } else {
-          addMessage('Recording was too short or silent. Please try speaking again.', 'bot');
+          addMessage('Recording was too short. Please try again.', 'bot');
         }
       };
 
@@ -461,24 +413,17 @@ async function toggleRecording() {
 
       if (micBtn) {
         micBtn.classList.add('bg-red-600', 'text-white', 'animate-pulse');
-        micBtn.classList.remove('text-emerald-600', 'border-emerald-600');
-        micBtn.title = "Click again to STOP and Send";
         micBtn.innerText = "⏹️";
       }
     } catch (err) {
-      console.error("Mic Access Error:", err);
-      alert('Microphone access denied or not available.');
+      alert('Microphone access denied.');
     }
   } else {
-    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-      mediaRecorder.stop();
-    }
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
     isRecording = false;
 
     if (micBtn) {
       micBtn.classList.remove('bg-red-600', 'text-white', 'animate-pulse');
-      micBtn.classList.add('text-emerald-600', 'border-emerald-600');
-      micBtn.title = "Voice Input";
       micBtn.innerText = "🎤";
     }
   }
@@ -503,17 +448,15 @@ async function sendVoiceMessage(audioBlob) {
 
     if (loadingMsg) loadingMsg.remove();
     
-    if (data.transcript && data.transcript.trim() !== '.' && data.transcript.trim().length > 1) {
+    if (data.transcript && data.transcript.trim().length > 1) {
       addMessage(data.transcript, 'user');
       addMessage(data.reply, 'bot', false, data.audio_url);
     } else {
-      addMessage("Sorry, I couldn't hear you clearly. Please try speaking again.", 'bot');
+      addMessage("Sorry, couldn't hear clearly. Please speak again.", 'bot');
     }
-
   } catch (err) {
-    console.error("Voice Chat API Error:", err);
     if (loadingMsg) loadingMsg.remove();
-    addMessage('Voice processing error. Please try typing.', 'bot');
+    addMessage('Voice processing error.', 'bot');
   } finally {
     if (sendBtn) sendBtn.disabled = false;
     if (micBtn) micBtn.disabled = false;
@@ -578,97 +521,6 @@ if (searchInputEl) {
   searchInputEl.addEventListener('input', () => {
     onSearchChange();
   });
-}
-
-function openEligibilityModal() {
-  const modal = document.getElementById('eligibilityModal');
-  if (modal) modal.classList.remove('hidden');
-}
-
-function closeEligibilityModal() {
-  const modal = document.getElementById('eligibilityModal');
-  if (modal) modal.classList.add('hidden');
-}
-
-function resetEligibilityForm() {
-  const formEl = document.getElementById('eligibilityForm');
-  const resultsEl = document.getElementById('eligibilityResults');
-  if (formEl) formEl.classList.remove('hidden');
-  if (resultsEl) resultsEl.classList.add('hidden');
-}
-
-async function calculateEligibility(event) {
-  if (event) event.preventDefault();
-
-  const ageVal = parseInt(document.getElementById('userAge')?.value) || 0;
-  const genderVal = document.getElementById('userGender')?.value || 'female';
-  const stateVal = document.getElementById('userState')?.value || 'DL';
-  const occupationVal = document.getElementById('userOccupation')?.value || 'student';
-  const incomeVal = parseInt(document.getElementById('userIncome')?.value) || 250000;
-
-  const payload = {
-    age: ageVal,
-    gender: genderVal,
-    state: stateVal,
-    occupation: occupationVal,
-    income: incomeVal
-  };
-
-  const formEl = document.getElementById('eligibilityForm');
-  const resultsEl = document.getElementById('eligibilityResults');
-  const listEl = document.getElementById('matchedSchemesList');
-  const countHeader = document.getElementById('resultsCountHeader');
-
-  if (listEl) listEl.innerHTML = `<p class="text-slate-500 text-center py-4">Checking eligibility with backend server...</p>`;
-  if (formEl) formEl.classList.add('hidden');
-  if (resultsEl) resultsEl.classList.remove('hidden');
-
-  try {
-    const res = await fetch('/api/check-eligibility', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json();
-    const matchedSchemes = data.matched_schemes || [];
-
-    if (countHeader) countHeader.innerText = `Matched (${matchedSchemes.length}) Eligible Schemes`;
-
-    if (!listEl) return;
-    listEl.innerHTML = '';
-
-    if (matchedSchemes.length === 0) {
-      listEl.innerHTML = `<p class="text-slate-400 text-center py-4">No specific schemes matched your criteria. Try adjusting details.</p>`;
-      return;
-    }
-
-    matchedSchemes.forEach((scheme) => {
-      const schemeTitle = scheme.name || scheme.title || "Government Scheme";
-      const schemeCategory = scheme.category || "General";
-      const schemeBenefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
-
-      const item = document.createElement('div');
-      item.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl flex justify-between items-center hover:bg-emerald-50/50 transition cursor-pointer mb-2";
-      item.onclick = () => {
-        closeEligibilityModal();
-        openModal(scheme.id);
-      };
-      item.innerHTML = `
-        <div>
-          <span class="text-[9px] font-bold uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">${schemeCategory}</span>
-          <h5 class="font-bold text-slate-800 text-xs mt-1">${schemeTitle}</h5>
-          <p class="text-[11px] text-emerald-700 font-semibold">${schemeBenefit}</p>
-        </div>
-        <span class="text-xs text-blue-600 font-bold">View →</span>
-      `;
-      listEl.appendChild(item);
-    });
-
-  } catch (err) {
-    console.error("Eligibility API Error:", err);
-    if (listEl) listEl.innerHTML = `<p class="text-red-500 text-center py-4">Error connecting to server. Please try again.</p>`;
-  }
 }
 
 fetchSchemesFromBackend();
