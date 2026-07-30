@@ -1,4 +1,3 @@
-// Global State & Data Store
 let SCHEMES_DATABASE = [];
 let activeTab = 'dashboard';
 let currentGlobalState = 'ALL';
@@ -12,7 +11,6 @@ const quickRepliesEl = document.getElementById('quickReplies');
 
 const DEFAULT_QUICK_REPLIES = ['Bihar Student Credit Card', 'PM Kisan Scheme', 'Old Age Pension Eligibility'];
 
-// ================= BOOKMARKING / LOCALSTORAGE LOGIC =================
 function getBookmarks() {
   try {
     return JSON.parse(localStorage.getItem('janseva_bookmarks') || '[]');
@@ -43,7 +41,6 @@ function toggleBookmark(event, schemeId) {
   if (activeTab === 'states') selectStatePortal(currentGlobalState === 'ALL' ? 'BR' : currentGlobalState);
 }
 
-// ================= SEARCH HIGHLIGHTING UTILITY =================
 function highlightText(text, query) {
   if (!text) return '';
   if (!query || query.trim() === '') return text;
@@ -53,7 +50,6 @@ function highlightText(text, query) {
   return text.replace(regex, '<mark class="bg-yellow-200 text-yellow-900 font-semibold px-0.5 rounded">$1</mark>');
 }
 
-// Fetch Schemes Data from Backend JSON on Load
 async function fetchSchemesFromBackend() {
   try {
     const res = await fetch('/schemes.json');
@@ -146,8 +142,9 @@ function renderCatalog() {
       return isBookmarked(s.id);
     }
 
-    const sState = s.eligibility?.location || s.state || 'CENTRAL';
-    const matchState = (currentGlobalState === 'ALL') || (sState === 'CENTRAL') || (sState === currentGlobalState);
+    const sState = (s.eligibility?.location || s.state || 'CENTRAL').toUpperCase();
+    const targetState = currentGlobalState.toUpperCase();
+    const matchState = (targetState === 'ALL') || (sState === 'CENTRAL') || (sState === targetState);
     
     let matchCat = (currentCatalogCat === 'ALL');
     if (!matchCat) {
@@ -188,15 +185,15 @@ function renderCatalog() {
 function setCatalogCat(cat, btnElement) {
   currentCatalogCat = cat;
 
-  const buttons = document.querySelectorAll('.cat-filter-btn');
+  const buttons = document.querySelectorAll('.cat-filter-btn, .category-btn');
   buttons.forEach(btn => {
-    btn.classList.remove('bg-emerald-800', 'text-white');
+    btn.classList.remove('active', 'bg-emerald-800', 'bg-emerald-600', 'text-white');
     btn.classList.add('bg-slate-100', 'text-slate-600');
   });
 
   if (btnElement) {
     btnElement.classList.remove('bg-slate-100', 'text-slate-600');
-    btnElement.classList.add('bg-emerald-800', 'text-white');
+    btnElement.classList.add('active', 'bg-emerald-600', 'text-white');
   }
 
   renderCatalog();
@@ -210,7 +207,7 @@ function filterByCategory(cat) {
   currentCatalogCat = cat;
   switchTab('schemes');
   
-  const buttons = document.querySelectorAll('.cat-filter-btn');
+  const buttons = document.querySelectorAll('.cat-filter-btn, .category-btn');
   buttons.forEach(btn => {
     if (btn.innerText.toLowerCase().includes(cat.toLowerCase())) {
       setCatalogCat(cat, btn);
@@ -219,6 +216,7 @@ function filterByCategory(cat) {
 }
 
 function selectStatePortal(stateCode) {
+  currentGlobalState = stateCode;
   const container = document.getElementById('stateSpecificGrid');
   if (!container) return;
 
@@ -239,15 +237,25 @@ function selectStatePortal(stateCode) {
     'KA': 'Karnataka', 'WB': 'West Bengal' 
   };
   
+  const targetStateName = (stateNames[stateCode] || stateCode).toLowerCase();
   const titleEl = document.getElementById('statePortalTitle');
   if (titleEl) titleEl.innerText = `${stateNames[stateCode] || stateCode} Schemes`;
 
   const stateSchemes = SCHEMES_DATABASE.filter(s => {
-    const sState = s.eligibility?.location || s.state || 'CENTRAL';
-    return sState === stateCode || sState === 'CENTRAL';
+    const sStateRaw = (s.eligibility?.location || s.state || 'CENTRAL').toString().toLowerCase();
+    return sStateRaw === stateCode.toLowerCase() || 
+           sStateRaw === targetStateName || 
+           sStateRaw === 'central' || 
+           sStateRaw === 'all india' || 
+           sStateRaw === 'all';
   });
 
   container.innerHTML = '';
+  if (stateSchemes.length === 0) {
+    container.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-400 py-10">No schemes found for this state.</p>`;
+    return;
+  }
+
   stateSchemes.forEach((scheme) => {
     const card = document.createElement('div');
     card.className = "scheme-card bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition";
@@ -257,7 +265,6 @@ function selectStatePortal(stateCode) {
   });
 }
 
-// Helper: Generates realistic documents list if JSON data is short
 function getRealisticDocuments(scheme) {
   const rawDocs = scheme.documents_required || scheme.documents;
   if (Array.isArray(rawDocs) && rawDocs.length >= 4) {
@@ -321,7 +328,6 @@ function openModal(schemeId) {
   const applyUrl = scheme.apply_url || `https://www.google.com/search?q=${encodeURIComponent(title + " official portal apply online")}`;
   const bookmarked = isBookmarked(scheme.id);
 
-  // Get realistic comprehensive document checklist
   const docsList = getRealisticDocuments(scheme);
 
   if (modalContent) {
@@ -410,7 +416,6 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
   return wrapper;
 }
 
-// ================= FIXED VOICE RECORDING LOGIC =================
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
@@ -575,8 +580,6 @@ if (searchInputEl) {
   });
 }
 
-// ================= DYNAMIC BACKEND ELIGIBILITY ENGINE =================
-
 function openEligibilityModal() {
   const modal = document.getElementById('eligibilityModal');
   if (modal) modal.classList.remove('hidden');
@@ -668,7 +671,6 @@ async function calculateEligibility(event) {
   }
 }
 
-// APP INITIALIZATION
 fetchSchemesFromBackend();
 
 if (chatEl && chatEl.children.length === 0) {
