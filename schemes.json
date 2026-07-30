@@ -1,0 +1,1398 @@
+[
+  {
+    "id": "atal_pension",
+    "name": "Atal Pension Yojana (APY)",
+    "category": "Pension",
+    "description": "Guaranteed monthly pension of Rs. 1,000 to Rs. 5,000 after age 60 for unorganized sector workers.",
+    "apply_url": "https://enps.nsdl.com/eNPS/NationalPensionSystem.html",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 18,
+      "age_max": 40,
+      "gender": "any",
+      "occupation": ["unorganized_sector", "unemployed", "laborer", "self_employed"],
+      "income_max": 800000,
+      "exclusions": ["income_tax_payer"]
+    },
+    "benefits": "Fixed monthly pension of Rs. 1,000 to Rs. 5,000 after age 60.",
+    "documents_required": [
+      "Aadhaar Card (Mandatory Identity Proof)",
+      "Active Savings Bank Account Passbook",
+      "Mobile Number linked with Bank Account",
+      "Nominee Details & Relationship Proof"
+    ],
+    "how_to_apply": "Apply online through Net Banking / eNPS NSDL portal or visit your bank branch."
+  },
+  {
+    "id": "old_age_pension",
+    "name": "Indira Gandhi National Old Age Pension Scheme (IGNOAPS)",
+    "category": "Pension",
+    "description": "Monthly pension for senior citizens (aged 60+) belonging to Below Poverty Line (BPL) families.",
+    "apply_url": "https://nsap.nic.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 60,
+      "age_max": 100,
+      "gender": "any",
+      "occupation": ["any", "unemployed", "farmer"],
+      "income_max": 100000,
+      "exclusions": []
+    },
+    "benefits": "Monthly financial pension directly transferred to bank account.",
+    "documents_required": [
+      "Aadhaar Card (Identity & Address Proof)",
+      "Age Proof Certificate (Voter ID / Birth Certificate / Medical Certificate)",
+      "Valid BPL Ration Card / BPL Survey Number",
+      "Active Bank Account Passbook Copy",
+      "Passport Size Photographs (2 Copies)"
+    ],
+    "how_to_apply": "Apply online via NSAP portal (nsap.nic.in) or at District Social Welfare Office."
+  },
+  {
+    "id": "widow_pension",
+    "name": "Indira Gandhi National Widow Pension Scheme (IGNWPS)",
+    "category": "Pension",
+    "description": "Financial assistance pension provided to widows living below the poverty line.",
+    "apply_url": "https://nsap.nic.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "gender": "female",
+      "occupation": ["any", "unemployed"],
+      "income_max": 100000,
+      "age_min": 40,
+      "age_max": 79,
+      "exclusions": []
+    },
+    "benefits": "Monthly pension support directly to beneficiary bank account.",
+    "documents_required": [
+      "Aadhaar Card of Applicant",
+      "Husband's Death Certificate (Issued by Registrar/Panchayat)",
+      "BPL Certificate / Income Certificate from Tehsildar",
+      "Bank Account Passbook (Aadhaar Seeded)",
+      "Passport Size Photograph"
+    ],
+    "how_to_apply": "Apply through NSAP online portal or District Social Welfare Department."
+  },
+  {
+    "id": "disability_pension",
+    "name": "Indira Gandhi National Disability Pension Scheme (IGNDPS)",
+    "category": "Pension",
+    "description": "Monthly pension support for persons with severe disabilities (80%+ disability) from BPL families.",
+    "apply_url": "https://nsap.nic.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 18,
+      "age_max": 79,
+      "gender": "any",
+      "occupation": ["any", "unemployed"],
+      "income_max": 100000,
+      "exclusions": []
+    },
+    "benefits": "Monthly pension assistance disbursed into bank account.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Disability Certificate / UDID Card (80%+ Disability issued by Medical Board)",
+      "BPL Proof / Income Certificate",
+      "Bank Account Details",
+      "Passport Size Photograph"
+    ],
+    "how_to_apply": "Apply at nsap.nic.in or local Panchayat / Social Welfare Office."
+  },
+  {
+    "id": "pm_shram_yogi_mandhan",
+    "name": "PM Shram Yogi Maan-Dhan (PM-SYM)",
+    "category": "Pension",
+    "description": "Voluntary pension scheme for unorganized workers guaranteeing Rs. 3,000/month after age 60.",
+    "apply_url": "https://maandhan.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 18,
+      "age_max": 40,
+      "gender": "any",
+      "occupation": ["unorganized_sector", "laborer", "street_vendor"],
+      "income_max": 180000,
+      "exclusions": ["income_tax_payer", "epfo_member"]
+    },
+    "benefits": "Assured monthly pension of Rs. 3,000 upon reaching 60 years of age.",
+    "documents_required": [
+      "Aadhaar Card (Mandatory)",
+      "Savings Bank Account / Jan Dhan Account Passbook with IFSC Code",
+      "Active Mobile Number",
+      "Auto-Debit Mandate Form"
+    ],
+    "how_to_apply": "Register at nearest CSC center or online at maandhan.in portal."
+  },
+  {
+    "id": "pm_kisan_mandhan",
+    "name": "PM Kisan Maan-Dhan Yojana (PM-KMY)",
+    "category": "Pension",
+    "description": "Old age pension scheme for Small and Marginal Farmers (SMF) across India.",
+    "apply_url": "https://maandhan.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 18,
+      "age_max": 40,
+      "gender": "any",
+      "occupation": ["farmer"],
+      "income_max": 300000,
+      "exclusions": ["income_tax_payer"]
+    },
+    "benefits": "Minimum guaranteed pension of Rs. 3,000/month after reaching 60 years.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Land Ownership Proof (Khasra/Khatauni Papers up to 2 Hectares)",
+      "PM-Kisan Registration ID / Bank Passbook",
+      "Aadhaar-linked Mobile Number"
+    ],
+    "how_to_apply": "Enroll through local Common Service Centre (CSC) or maandhan.in."
+  },
+  {
+    "id": "pm_kisan",
+    "name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+    "category": "Agriculture",
+    "description": "Income support of Rs. 6,000 per year to landholding farmer families, paid in 3 equal installments.",
+    "apply_url": "https://pmkisan.gov.in",
+    "eligibility": {
+      "occupation": ["farmer"],
+      "age_min": 18,
+      "age_max": 100,
+      "gender": "any",
+      "location": "CENTRAL",
+      "income_max": 250000,
+      "exclusions": ["income_tax_payer", "govt_employee"]
+    },
+    "benefits": "Rs. 6,000/year in 3 equal installments directly to bank account.",
+    "documents_required": [
+      "Aadhaar Card (Mandatory for e-KYC)",
+      "Land Ownership Documents / LPC / Khatauni Record",
+      "Bank Account Passbook (Aadhaar Seeded)",
+      "Active Mobile Number for OTP Verification"
+    ],
+    "how_to_apply": "Apply online at pmkisan.gov.in or visit nearest Common Service Centre (CSC)."
+  },
+  {
+    "id": "fasal_bima",
+    "name": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+    "category": "Agriculture",
+    "description": "Crop insurance scheme protecting farmers against crop loss due to natural calamities.",
+    "apply_url": "https://pmfby.gov.in",
+    "eligibility": {
+      "occupation": ["farmer"],
+      "age_min": 18,
+      "age_max": 100,
+      "gender": "any",
+      "location": "CENTRAL",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "Low premium (2% Kharif, 1.5% Rabi crops) compensation for crop loss.",
+    "documents_required": [
+      "Land Possession Certificate (LPC) / Land Rent Receipt",
+      "Sowing Certificate issued by Patwari/Gram Sevak",
+      "Aadhaar Card & Bank Account Passbook",
+      "Tenant Agreement (For Sharecroppers)"
+    ],
+    "how_to_apply": "Apply through commercial bank branch, CSC, or pmfby.gov.in."
+  },
+  {
+    "id": "kisan_credit_card",
+    "name": "Kisan Credit Card (KCC) Scheme",
+    "category": "Agriculture",
+    "description": "Concessional short-term credit to farmers for agricultural and farming needs.",
+    "apply_url": "https://pmkisan.gov.in",
+    "eligibility": {
+      "occupation": ["farmer"],
+      "age_min": 18,
+      "age_max": 75,
+      "gender": "any",
+      "location": "CENTRAL",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "Short-term loans up to Rs. 3 Lakh at 4% effective interest rate.",
+    "documents_required": [
+      "Duly Filled KCC Application Form",
+      "Aadhaar Card & PAN Card",
+      "Land Ownership Title Papers (Revenue Record)",
+      "No-Dues Certificate from Neighboring Banks"
+    ],
+    "how_to_apply": "Apply online via PM-Kisan portal or at any bank branch."
+  },
+  {
+    "id": "pm_kusum_solar",
+    "name": "PM-KUSUM Solar Pump Scheme",
+    "category": "Agriculture",
+    "description": "Subsidies for farmers to install standalone solar water pumps and solarize existing grid-connected pumps.",
+    "apply_url": "https://pmkusum.mnre.gov.in",
+    "eligibility": {
+      "occupation": ["farmer"],
+      "age_min": 18,
+      "age_max": 80,
+      "gender": "any",
+      "location": "CENTRAL",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Up to 60% government subsidy for solar pump installation.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Land Record Documents (Khasra Copy / Jamabandi)",
+      "Bank Account Passbook",
+      "No-Objection Certificate (NOC) from DISCOM",
+      "Passport Photo"
+    ],
+    "how_to_apply": "Apply online through state MNRE designated nodal portals or pmkusum.mnre.gov.in."
+  },
+  {
+    "id": "bihar_diesel_anudan",
+    "name": "Bihar Diesel Anudan Yojana",
+    "category": "Agriculture",
+    "description": "Financial subsidy provided to Bihar farmers for purchasing diesel to irrigate crops.",
+    "apply_url": "https://dbtagriculture.bihar.gov.in",
+    "eligibility": {
+      "location": "BR",
+      "occupation": ["farmer"],
+      "age_min": 18,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 500000,
+      "exclusions": []
+    },
+    "benefits": "Subsidy of Rs. 75 per liter for crop irrigation.",
+    "documents_required": [
+      "13-Digit DBT Bihar Farmer Registration ID",
+      "Original Diesel Purchase Voucher / Receipt (With Registration No.)",
+      "Land Ownership Proof (LPC) or Tenant Verification Form",
+      "Aadhaar-linked Bank Account Details"
+    ],
+    "how_to_apply": "Apply online at dbtagriculture.bihar.gov.in."
+  },
+  {
+    "id": "pm_matsya_sampada",
+    "name": "PM Matsya Sampada Yojana (PMMSY)",
+    "category": "Agriculture",
+    "description": "Subsidies and financial support for fish farmers, aquaculture, and fisheries infrastructure development.",
+    "apply_url": "https://pmmsy.dof.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["farmer", "self_employed", "unorganized_sector"],
+      "age_min": 18,
+      "age_max": 70,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "40% financial subsidy for General category and 60% for Women / SC / ST beneficiaries.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Land Record / Pond Lease Agreement Proof",
+      "Detailed Project Report (DPR) for Aquaculture",
+      "Bank Account Details & Cancelled Cheque",
+      "Caste / Category Certificate (If applicable for 60% subsidy)"
+    ],
+    "how_to_apply": "Apply online at pmmsy.dof.gov.in or through District Fisheries Office."
+  },
+  {
+    "id": "namo_drone_didi",
+    "name": "Namo Drone Didi Scheme",
+    "category": "Agriculture",
+    "description": "Equips women Self-Help Groups (SHGs) with agricultural drones and pilot training for crop monitoring and liquid fertilizer spraying.",
+    "apply_url": "https://agricoop.nic.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "gender": "female",
+      "occupation": ["farmer", "unorganized_sector", "self_employed"],
+      "age_min": 18,
+      "age_max": 55,
+      "income_max": 300000,
+      "exclusions": []
+    },
+    "benefits": "Free drone equipment + certified pilot training to generate a minimum Rs. 1 Lakh annual income for SHGs.",
+    "documents_required": [
+      "Aadhaar Card of Female SHG Member",
+      "SHG Group Registration Certificate & Membership Proof",
+      "Active Bank Account Passbook",
+      "10th Class Marksheet / Basic Literacy Proof"
+    ],
+    "how_to_apply": "Apply through local DAY-NRLM Self-Help Group network or District Agriculture Office."
+  },
+  {
+    "id": "pmksy_irrigation",
+    "name": "Pradhan Mantri Krishi Sinchayee Yojana (PMKSY)",
+    "category": "Agriculture",
+    "description": "Subsidies for drip and sprinkler micro-irrigation systems to maximize crop yield per drop of water.",
+    "apply_url": "https://pmksy.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["farmer"],
+      "age_min": 18,
+      "age_max": 80,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Up to 55% subsidy for small/marginal farmers on micro-irrigation equipment.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Land Ownership Record / Khasra-Khatauni Copy",
+      "Soil & Water Testing Report Copy",
+      "Aadhaar-Seeded Bank Passbook"
+    ],
+    "how_to_apply": "Apply online via state horticulture/agriculture portal or through District Irrigation Department."
+  },
+  {
+    "id": "pm_pranam",
+    "name": "PM Programme for Restoration, Awareness, Nourishment & Amelioration of Mother Earth (PM-PRANAM)",
+    "category": "Agriculture",
+    "description": "Promotes balanced use of chemical fertilizers along with organic and bio-fertilizers to improve soil health.",
+    "apply_url": "https://agricoop.nic.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["farmer"],
+      "age_min": 18,
+      "age_max": 80,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Grants and subsidies for bio-fertilizers + soil degradation reduction support.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Soil Health Card Copy",
+      "Land Ownership Document",
+      "Bank Account Details"
+    ],
+    "how_to_apply": "Inquire and register at local Krishi Vigyan Kendra (KVK) or Gram Panchayat Agriculture Camp."
+  },
+  {
+    "id": "agri_infrastructure_fund",
+    "name": "Agriculture Infrastructure Fund (AIF)",
+    "category": "Agriculture",
+    "description": "Medium to long-term debt financing facility for investment in viable projects for post-harvest management infrastructure.",
+    "apply_url": "https://agriinfra.dac.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["farmer", "self_employed"],
+      "age_min": 18,
+      "age_max": 65,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "3% per annum interest subvention on loans up to Rs. 2 Crores + credit guarantee coverage.",
+    "documents_required": [
+      "Duly Filled AIF Loan Application",
+      "Detailed Project Report (DPR) for Cold Storage / Processing Unit",
+      "Applicant Aadhaar Card & PAN Card",
+      "Land Ownership or Lease Agreement Document",
+      "Bank Statements of Last 12 Months"
+    ],
+    "how_to_apply": "Submit project proposal directly on agriinfra.dac.gov.in portal."
+  },
+  {
+    "id": "ujjwala",
+    "name": "Pradhan Mantri Ujjwala Yojana (PMUY)",
+    "category": "Women",
+    "description": "Free LPG gas connection to women from Below Poverty Line (BPL) households.",
+    "apply_url": "https://pmuy.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "gender": "female",
+      "occupation": ["any", "unemployed", "farmer"],
+      "income_max": 100000,
+      "age_min": 18,
+      "age_max": 80,
+      "exclusions": ["existing_lpg_connection"]
+    },
+    "benefits": "Free LPG connection along with first refill cylinder and stove.",
+    "documents_required": [
+      "Aadhaar Card of Applicant & All Adult Family Members",
+      "BPL Ration Card / SECC-2011 Data Proof",
+      "Aadhaar-linked Bank Passbook Details",
+      "Self-Declaration of No Existing LPG Connection"
+    ],
+    "how_to_apply": "Visit nearest LPG gas distributor or apply online at pmuy.gov.in."
+  },
+  {
+    "id": "pmmvy",
+    "name": "PM Matru Vandana Yojana (PMMVY)",
+    "category": "Women",
+    "description": "Maternity cash incentive for pregnant and lactating mothers to cover health and nutrition costs.",
+    "apply_url": "https://pmmvy.wcd.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "gender": "female",
+      "occupation": ["any", "unemployed"],
+      "age_min": 19,
+      "age_max": 55,
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "Rs. 5,000 for first child; additional Rs. 6,000 for second child if a girl child.",
+    "documents_required": [
+      "Mother's Aadhaar Card",
+      "MCP (Mother and Child Protection) Card with Vaccination Stamp",
+      "Child's Birth Certificate",
+      "Aadhaar-Seeded Bank Passbook Copy"
+    ],
+    "how_to_apply": "Register at nearest Anganwadi Centre or apply directly at pmmvy.wcd.gov.in."
+  },
+  {
+    "id": "sukanya_samriddhi",
+    "name": "Sukanya Samriddhi Yojana (SSY)",
+    "category": "Women",
+    "description": "High-interest government savings scheme for girl children, maturing when she turns 21.",
+    "apply_url": "https://www.indiapost.gov.in",
+    "eligibility": {
+      "gender": "female",
+      "occupation": ["any", "student"],
+      "age_min": 0,
+      "age_max": 10,
+      "location": "CENTRAL",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "High compound interest rate + complete tax exemption under Section 80C.",
+    "documents_required": [
+      "Girl Child Birth Certificate (Issued by Municipal/Panchayat Body)",
+      "Parent / Guardian Aadhaar Card & PAN Card",
+      "Address Proof (Voter ID / Utility Bill / Passport)",
+      "Passport Size Photos of Child & Guardian"
+    ],
+    "how_to_apply": "Open account at any Post Office or authorized commercial bank branch."
+  },
+  {
+    "id": "delhi_pink_pass",
+    "name": "Delhi Pink Pass Scheme (Free Bus Travel for Women)",
+    "category": "Women",
+    "description": "Provides free daily commute for all female residents and students on DTC and Cluster buses across Delhi.",
+    "apply_url": "https://transport.delhi.gov.in",
+    "eligibility": {
+      "location": "DL",
+      "occupation": ["any", "student", "unemployed", "unorganized_sector"],
+      "age_min": 5,
+      "age_max": 100,
+      "gender": "female",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "100% Free daily commute across all public DTC and Cluster bus routes in Delhi.",
+    "documents_required": [
+      "Delhi Residence / Identity Card (For Verification if asked)",
+      "Student Photo ID Card (If Student)",
+      "No prior registration needed — Direct Conductor Issuance"
+    ],
+    "how_to_apply": "Obtain single-journey Pink Single Tickets directly from bus conductors or via One Delhi Mobile App."
+  },
+  {
+    "id": "gruha_lakshmi",
+    "name": "Gruha Lakshmi Scheme (Karnataka)",
+    "category": "Women",
+    "description": "Monthly direct benefit transfer to female heads of households in Karnataka.",
+    "apply_url": "https://sevasindhugs.karnataka.gov.in",
+    "eligibility": {
+      "gender": "female",
+      "location": "KA",
+      "occupation": ["any", "unemployed"],
+      "age_min": 18,
+      "age_max": 80,
+      "income_max": 250000,
+      "exclusions": ["income_tax_payer", "govt_employee"]
+    },
+    "benefits": "Rs. 2,000 per month directly transferred to bank account.",
+    "documents_required": [
+      "Aadhaar Card of Female Head of Family",
+      "Karnataka BPL / Antyodaya / APL Ration Card",
+      "Aadhaar-linked Bank Account Passbook",
+      "Husband's Aadhaar Card (For tax exemption check)"
+    ],
+    "how_to_apply": "Apply via Seva Sindhu portal or Grama One centres."
+  },
+  {
+    "id": "kanyashree",
+    "name": "Kanyashree Prakalpa (West Bengal)",
+    "category": "Women",
+    "description": "Conditional cash transfer to keep girl students in school and delay underage marriage.",
+    "apply_url": "https://wbkanyashree.gov.in",
+    "eligibility": {
+      "gender": "female",
+      "occupation": ["student"],
+      "age_min": 13,
+      "age_max": 19,
+      "location": "WB",
+      "income_max": 120000,
+      "exclusions": []
+    },
+    "benefits": "Rs. 1,000/year annual scholarship (K1) plus a one-time grant of Rs. 25,000 (K2) at age 18.",
+    "documents_required": [
+      "Unmarried Declaration Form Signed by Parent",
+      "School Enrollment Certificate / Bonafide Proof",
+      "Family Income Certificate below Rs. 1.2 Lakh",
+      "Student's Aadhaar Card & Bank Account Passbook"
+    ],
+    "how_to_apply": "Apply through school or college portal at wbkanyashree.gov.in."
+  },
+  {
+    "id": "mukhyamantri_kanya_utthan",
+    "name": "Mukhyamantri Kanya Utthan (Bihar)",
+    "category": "Women",
+    "description": "Financial assistance given to girl students in Bihar from birth through college graduation.",
+    "apply_url": "https://medhasoft.bih.nic.in",
+    "eligibility": {
+      "location": "BR",
+      "gender": "female",
+      "occupation": ["student"],
+      "age_min": 16,
+      "age_max": 25,
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "Up to Rs. 50,000 total cash benefit provided across educational milestones.",
+    "documents_required": [
+      "Graduation / 12th Board Certificate & Marksheet",
+      "Bihar Residential / Domicile Certificate",
+      "Aadhaar Card",
+      "Bank Account Passbook (In Beneficiary Name Only)"
+    ],
+    "how_to_apply": "Apply online at medhasoft.bih.nic.in."
+  },
+  {
+    "id": "lakhpati_didi",
+    "name": "Lakhpati Didi Scheme",
+    "category": "Women",
+    "description": "Skill development and financial support for Self-Help Group (SHG) women to earn a minimum annual income of Rs. 1 Lakh.",
+    "apply_url": "https://nrlm.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "gender": "female",
+      "occupation": ["unorganized_sector", "unemployed", "farmer", "self_employed"],
+      "age_min": 18,
+      "age_max": 60,
+      "income_max": 250000,
+      "exclusions": []
+    },
+    "benefits": "Interest-free / Subsidized SHG loans up to Rs. 5 Lakhs + technical skill training for micro-enterprises.",
+    "documents_required": [
+      "Aadhaar Card of Applicant",
+      "Active Self-Help Group (SHG) Membership Proof",
+      "Aadhaar-Seeded Bank Passbook Copy",
+      "Passport Size Photographs",
+      "Skill Training Consent Form"
+    ],
+    "how_to_apply": "Apply through local NRLM / SRLM Co-ordinator or Block Development Office (BDO)."
+  },
+  {
+    "id": "ladli_behna_mp",
+    "name": "Mukhyamantri Ladli Behna Yojana (Madhya Pradesh)",
+    "category": "Women",
+    "description": "Direct monthly financial support to married women in Madhya Pradesh to foster economic independence.",
+    "apply_url": "https://cmladlibehna.mp.gov.in",
+    "eligibility": {
+      "location": "MP",
+      "gender": "female",
+      "occupation": ["any", "unemployed", "farmer"],
+      "age_min": 21,
+      "age_max": 60,
+      "income_max": 250000,
+      "exclusions": ["income_tax_payer", "govt_employee"]
+    },
+    "benefits": "Rs. 1,250 per month directly transferred to the beneficiary's bank account.",
+    "documents_required": [
+      "Samagra Family ID & Individual Samagra ID",
+      "Aadhaar Card (Mandatory)",
+      "Active Bank Account with e-KYC & DBT Enabled",
+      "Mobile Number linked with Samagra"
+    ],
+    "how_to_apply": "Apply through designated Gram Panchayat / Ward Camps in MP or at cmladlibehna.mp.gov.in."
+  },
+  {
+    "id": "pm_internship_scheme",
+    "name": "PM Internship Scheme (PMIS)",
+    "category": "Youth",
+    "description": "12-month paid internship opportunity for youth in India's top 500 companies with real-world exposure and monthly stipend.",
+    "apply_url": "https://pminternship.mca.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["student", "unemployed"],
+      "age_min": 21,
+      "age_max": 24,
+      "gender": "any",
+      "income_max": 800000,
+      "exclusions": ["full_time_employed", "iit_iim_graduates"]
+    },
+    "benefits": "Rs. 5,000 monthly stipend + one-time incidentals grant of Rs. 6,000 + PMJJBY/PMSBY insurance cover.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Educational Certificates (Class 10th, 12th, ITI/Diploma/Graduation Marksheet)",
+      "Self-Declaration of No Family Govt Employee",
+      "Aadhaar-Seeded Bank Passbook Copy"
+    ],
+    "how_to_apply": "Register profile and apply online at pminternship.mca.gov.in portal."
+  },
+  {
+    "id": "delhi_higher_ed_fee_waiver",
+    "name": "Delhi Higher Education Support & Fee Waiver Scheme",
+    "category": "Youth",
+    "description": "Financial assistance and fee waivers for students pursuing higher education in Delhi state universities.",
+    "apply_url": "https://edistrict.delhigovt.nic.in",
+    "eligibility": {
+      "location": "DL",
+      "occupation": ["student"],
+      "age_min": 17,
+      "age_max": 30,
+      "gender": "any",
+      "income_max": 600000,
+      "exclusions": []
+    },
+    "benefits": "100% / 50% / 25% tuition fee waiver based on annual family income bracket.",
+    "documents_required": [
+      "Class 10 & 12 Marksheets / Graduation Transcripts",
+      "Delhi Domicile Certificate",
+      "SDM/Tehsildar Issued Income Certificate",
+      "College Fee Receipt & College ID Card",
+      "Bank Account Passbook"
+    ],
+    "how_to_apply": "Apply online through the Delhi e-District portal or via College Nodal Officer."
+  },
+  {
+    "id": "pm_usp_college_scholarship",
+    "name": "PM-USP Central Sector Scheme of Scholarship for College Students",
+    "category": "Youth",
+    "description": "Financial support for meritorious college and university students to meet day-to-day educational expenses.",
+    "apply_url": "https://scholarships.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["student"],
+      "age_min": 17,
+      "age_max": 25,
+      "gender": "any",
+      "income_max": 450000,
+      "exclusions": []
+    },
+    "benefits": "Rs. 12,000 per year at Graduation level (Rs. 20,000 per year at Post-Graduation level).",
+    "documents_required": [
+      "Class 12 Board Marksheet (Top 20th Percentile Score)",
+      "Family Income Certificate issued by Competent Authority",
+      "College Bonafide Student Certificate",
+      "Aadhaar Card & Bank Details"
+    ],
+    "how_to_apply": "Apply online via National Scholarship Portal (scholarships.gov.in)."
+  },
+  {
+    "id": "aicte_pragati_female",
+    "name": "AICTE Pragati Scholarship for Female Students",
+    "category": "Youth",
+    "description": "Dedicated scholarship designed to empower female students pursuing technical education (B.Tech / Diploma).",
+    "apply_url": "https://scholarships.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["student"],
+      "age_min": 16,
+      "age_max": 25,
+      "gender": "female",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "Rs. 50,000 per annum directly disbursed towards college fees, books, or computer equipment.",
+    "documents_required": [
+      "AICTE Approved College Admission / Seat Allotment Letter",
+      "Class 10 & 12 Marksheets",
+      "Family Income Certificate below Rs. 8 Lakhs",
+      "Tuition Fee Receipt & Bank Account Passbook"
+    ],
+    "how_to_apply": "Submit application through the National Scholarship Portal (scholarships.gov.in)."
+  },
+  {
+    "id": "pm_vidya_lakshmi",
+    "name": "PM Vidya Lakshmi Education Loan Scheme",
+    "category": "Youth",
+    "description": "Single-window portal for students to apply for collateral-free education loans and central interest subsidies.",
+    "apply_url": "https://www.vidyalakshmi.co.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["student"],
+      "age_min": 16,
+      "age_max": 35,
+      "gender": "any",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "Collateral-free educational loans up to Rs. 7.5 Lakhs with central interest subvention.",
+    "documents_required": [
+      "Admission Offer Letter & Official Fee Schedule",
+      "Class 10, 12, Graduation Marksheets",
+      "Parent & Student Aadhaar Card & PAN Card",
+      "Income Proof / ITR Copy of Parents",
+      "2 Passport Size Photos"
+    ],
+    "how_to_apply": "Register and submit unified loan application at vidyalakshmi.co.in."
+  },
+  {
+    "id": "delhi_jai_bhim_coaching",
+    "name": "Jai Bhim Mukhyamantri Pratibha Vikas Yojana (Delhi)",
+    "category": "Youth",
+    "description": "Free competitive exam coaching (UPSC, GATE, GRE, Banking, Technical) for eligible students residing in Delhi.",
+    "apply_url": "https://welfare.delhi.gov.in",
+    "eligibility": {
+      "location": "DL",
+      "occupation": ["student"],
+      "age_min": 17,
+      "age_max": 30,
+      "gender": "any",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "100% Free coaching course fee + Rs. 2,500 monthly stipend for study materials.",
+    "documents_required": [
+      "Delhi Domicile / Residence Certificate (Minimum 3 Years)",
+      "Caste / Category Certificate (SC/ST/OBC/EWS)",
+      "Class 10th & 12th Passing Marksheets",
+      "Income Certificate issued by Tehsildar"
+    ],
+    "how_to_apply": "Apply through empanelled coaching institutes or Delhi Social Welfare Department."
+  },
+  {
+    "id": "national_scholarship",
+    "name": "National Means-cum-Merit Scholarship",
+    "category": "Youth",
+    "description": "Scholarship for economically weaker students studying in class 9-12 to prevent dropouts.",
+    "apply_url": "https://scholarships.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["student"],
+      "income_max": 350000,
+      "age_min": 12,
+      "age_max": 18,
+      "gender": "any",
+      "exclusions": []
+    },
+    "benefits": "Rs. 12,000 per year (Rs. 1,000/month) for classes 9 through 12.",
+    "documents_required": [
+      "Class 7 & 8 Marksheets (Min 55% Marks)",
+      "NMMS Selection Test Result Scorecard",
+      "Income Certificate from Competent Revenue Officer",
+      "Aadhaar Card & Student Bank Passbook"
+    ],
+    "how_to_apply": "Apply through National Scholarship Portal (scholarships.gov.in)."
+  },
+  {
+    "id": "bihar_student_credit_card",
+    "name": "Bihar Student Credit Card Scheme",
+    "category": "Youth",
+    "description": "Education loan at highly subsidized interest rates for higher studies in Bihar.",
+    "apply_url": "https://www.7nishchay-yuvaupmission.bihar.gov.in",
+    "eligibility": {
+      "location": "BR",
+      "occupation": ["student"],
+      "age_min": 17,
+      "age_max": 25,
+      "gender": "any",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "Education loan up to Rs. 4 Lakh at 1% interest for female/PWD and 4% for male students.",
+    "documents_required": [
+      "Class 10th & 12th Original Marksheets & Certificates",
+      "Approved College Admission Letter & Course Fee Structure",
+      "Bihar Domicile Certificate",
+      "Aadhaar Card of Applicant & Co-applicant (Parent)",
+      "2 Passport Size Photos"
+    ],
+    "how_to_apply": "Apply online at 7nishchay-yuvaupmission.bihar.gov.in."
+  },
+  {
+    "id": "anupriti_coaching",
+    "name": "Mukhyamantri Anupriti Coaching Yojana (Rajasthan)",
+    "category": "Youth",
+    "description": "Free competitive exam coaching (IAS, RAS, NEET, JEE) for meritorious students in Rajasthan.",
+    "apply_url": "https://sjms.rajasthan.gov.in",
+    "eligibility": {
+      "location": "RJ",
+      "occupation": ["student"],
+      "age_min": 15,
+      "age_max": 30,
+      "gender": "any",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "100% free coaching fee plus annual hostel/food allowance of Rs. 40,000.",
+    "documents_required": [
+      "Jan Aadhaar Card / Rajasthan Domicile Proof",
+      "Caste Certificate (SC/ST/OBC/MBC/EWS)",
+      "Class 10th & 12th Marksheets",
+      "Annual Income Certificate"
+    ],
+    "how_to_apply": "Apply online via sjms.rajasthan.gov.in."
+  },
+  {
+    "id": "pm_kaushal_vikas",
+    "name": "PM Kaushal Vikas Yojana (PMKVY 4.0)",
+    "category": "Youth",
+    "description": "Free industry-aligned skill development training, certification, and job placement support for youth.",
+    "apply_url": "https://www.pmkvyofficial.org",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["student", "unemployed", "unorganized_sector"],
+      "age_min": 15,
+      "age_max": 45,
+      "gender": "any",
+      "income_max": 800000,
+      "exclusions": []
+    },
+    "benefits": "100% Free short-term training + Skill India Certification + Rs. 8,000 stipend incentive + Job Placement Support.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Class 10th / 12th Marksheet (If applicable)",
+      "Aadhaar-Seeded Bank Passbook Copy",
+      "Passport Size Photographs"
+    ],
+    "how_to_apply": "Register at nearest Pradhan Mantri Kaushal Kendra (PMKK) or online via Skill India Digital Hub."
+  },
+  {
+    "id": "national_apprenticeship_prom",
+    "name": "National Apprenticeship Promotion Scheme (NAPS)",
+    "category": "Youth",
+    "description": "Promotes apprenticeship training across industries by sharing stipend costs with employers to enhance youth employability.",
+    "apply_url": "https://www.apprenticeshipindia.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["student", "unemployed", "artisan"],
+      "age_min": 14,
+      "age_max": 35,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Government shares 25% of prescribed monthly stipend (up to Rs. 1,500/month) + On-the-job industrial training certification.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Educational Marksheet / ITI Certificate",
+      "Active Mobile Number & Email ID",
+      "Bank Account Details"
+    ],
+    "how_to_apply": "Register as a candidate at apprenticeshipindia.gov.in and apply for posted opportunities."
+  },
+  {
+    "id": "ayushman_bharat",
+    "name": "Ayushman Bharat - PM Jan Arogya Yojana (PM-JAY)",
+    "category": "Healthcare",
+    "description": "Health insurance cover of Rs. 5 lakh per family per year for secondary and tertiary hospitalization.",
+    "apply_url": "https://pmjay.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "farmer", "unemployed", "student", "unorganized_sector"],
+      "age_min": 0,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 250000,
+      "exclusions": ["income_tax_payer", "govt_employee"]
+    },
+    "benefits": "Cashless treatment up to Rs. 5,00,000 per family per year at empanelled hospitals.",
+    "documents_required": [
+      "Aadhaar Card (Mandatory for Biometric Verification)",
+      "Ration Card / PM-JAY Family Letter",
+      "Active Mobile Number",
+      "SECC-2011 Data Verification Proof"
+    ],
+    "how_to_apply": "Check eligibility at pmjay.gov.in or visit any empanelled hospital."
+  },
+  {
+    "id": "ayushman_vaya_vandana",
+    "name": "Ayushman Vaya Vandana Scheme (Senior Citizens 70+)",
+    "category": "Healthcare",
+    "description": "Universal cashless healthcare cover of Rs. 5 Lakh per year for ALL senior citizens aged 70 years and above, irrespective of income.",
+    "apply_url": "https://beneficiary.nha.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "unemployed", "farmer", "self_employed"],
+      "age_min": 70,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": ["existing_cghs_echs_beneficiary"]
+    },
+    "benefits": "Dedicated Rs. 5,00,000 per year cashless hospital treatment cover for 70+ seniors.",
+    "documents_required": [
+      "Aadhaar Card (Mandatory Age & Identity Verification)",
+      "Active Mobile Number linked with Aadhaar",
+      "Ration Card or Family Proof (Optional)"
+    ],
+    "how_to_apply": "e-KYC registration via Ayushman App or beneficiary.nha.gov.in portal."
+  },
+  {
+    "id": "swasthya_sathi",
+    "name": "Swasthya Sathi Health Scheme (West Bengal)",
+    "category": "Healthcare",
+    "description": "Universal cashless health insurance for permanent residents of West Bengal.",
+    "apply_url": "https://swasthyasathi.gov.in",
+    "eligibility": {
+      "location": "WB",
+      "occupation": ["any", "farmer", "student", "unemployed"],
+      "age_min": 0,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Cashless health cover up to Rs. 5,00,000 per family per year.",
+    "documents_required": [
+      "Aadhaar Card of Female Head & Family Members",
+      "West Bengal Khadya Sathi / Ration Card",
+      "Residential Certificate",
+      "Family Photo for Smart Card Generation"
+    ],
+    "how_to_apply": "Apply online at swasthyasathi.gov.in."
+  },
+  {
+    "id": "pm_jan_aushadhi",
+    "name": "PM Bharatiya Janaushadhi Pariyojana (PMBJP)",
+    "category": "Healthcare",
+    "description": "Provides quality generic medicines at affordable prices (50% to 90% cheaper) through Janaushadhi Kendra.",
+    "apply_url": "https://janaushadhi.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "student", "farmer", "unemployed"],
+      "age_min": 0,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Access to high-quality generic medicines at 50%-90% discount.",
+    "documents_required": [
+      "Valid Doctor's Prescription (Signed by Registered Medical Practitioner)",
+      "No Identity Proof Mandatory for Purchasing"
+    ],
+    "how_to_apply": "Purchase directly at any local Pradhan Mantri Bhartiya Janaushadhi Kendra."
+  },
+  {
+    "id": "janani_suraksha",
+    "name": "Janani Suraksha Yojana (JSY)",
+    "category": "Healthcare",
+    "description": "Direct cash assistance to pregnant women belonging to BPL families for promoting institutional deliveries in health centers.",
+    "apply_url": "https://nhm.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "gender": "female",
+      "occupation": ["any", "unemployed", "farmer"],
+      "age_min": 19,
+      "age_max": 45,
+      "income_max": 150000,
+      "exclusions": []
+    },
+    "benefits": "Direct cash incentive of Rs. 1,400 (Rural) or Rs. 1,000 (Urban) deposited into bank account post-delivery.",
+    "documents_required": [
+      "Mother's Aadhaar Card",
+      "MCP (Mother & Child Protection) Card / JSY Card",
+      "BPL Card / Income Certificate",
+      "Government Hospital Discharge Certificate",
+      "Bank Account Passbook Copy"
+    ],
+    "how_to_apply": "Register at primary health center (PHC/CHC) or through local ASHA worker."
+  },
+  {
+    "id": "nikshay_poshan",
+    "name": "Ni-kshay Poshan Yojana (TB Patients)",
+    "category": "Healthcare",
+    "description": "Direct financial assistance to all notified Tuberculosis (TB) patients for meeting nutritional needs during treatment.",
+    "apply_url": "https://nikshay.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "unemployed", "farmer", "student"],
+      "age_min": 0,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Rs. 500 per month direct bank transfer for the entire duration of TB medical treatment.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Official Ni-kshay Patient Registration ID",
+      "Doctor Diagnostic Report / Prescription",
+      "Aadhaar-Seeded Bank Passbook"
+    ],
+    "how_to_apply": "Automatic registration upon notification at government or empanelled private TB treatment centers."
+  },
+  {
+    "id": "national_mental_health_tele",
+    "name": "Tele-MANAS Mental Health Services",
+    "category": "Healthcare",
+    "description": "24x7 free and confidential mental health counseling, psychiatric tele-consultation, and support helpline.",
+    "apply_url": "https://telemanas.mohfw.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "student", "unemployed", "farmer"],
+      "age_min": 5,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "100% Free 24/7 tele-counseling in multiple regional languages by certified psychologists and psychiatrists.",
+    "documents_required": [
+      "No Document Mandatory — Direct Helpline Dialing (Toll Free: 14416 / 1800-891-4416)"
+    ],
+    "how_to_apply": "Call toll-free number 14416 or access services via Tele-MANAS portal."
+  },
+  {
+    "id": "pm_vishwakarma",
+    "name": "PM Vishwakarma Yojana",
+    "category": "Employment",
+    "description": "Support for traditional artisans and craftspeople with skill training, toolkits, and low-interest loans.",
+    "apply_url": "https://pmvishwakarma.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["unorganized_sector", "artisan", "self_employed"],
+      "age_min": 18,
+      "age_max": 60,
+      "gender": "any",
+      "income_max": 300000,
+      "exclusions": ["income_tax_payer"]
+    },
+    "benefits": "Rs. 15,000 toolkit incentive + collateral-free loans up to Rs. 3 Lakh at 5% interest.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Active Bank Account Details (IFSC & Account No.)",
+      "Mobile Number linked with Aadhaar",
+      "Trade Proof / Certificate of Artisan Skill"
+    ],
+    "how_to_apply": "Register online at pmvishwakarma.gov.in or at nearest CSC."
+  },
+  {
+    "id": "eshram",
+    "name": "e-Shram Card (Unorganised Workers)",
+    "category": "Employment",
+    "description": "National database for unorganized sector workers providing UAN and free accidental insurance.",
+    "apply_url": "https://eshram.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["unorganized_sector", "laborer", "daily_wage"],
+      "age_min": 16,
+      "age_max": 59,
+      "gender": "any",
+      "income_max": 250000,
+      "exclusions": ["income_tax_payer", "govt_employee"]
+    },
+    "benefits": "Universal Account Number (UAN) + Rs. 2 Lakh accidental insurance cover under PMSBY.",
+    "documents_required": [
+      "Aadhaar Card (Mandatory for Biometric/OTP)",
+      "Bank Account Passbook Details",
+      "Aadhaar-seeded Active Mobile Number"
+    ],
+    "how_to_apply": "Register at eshram.gov.in or nearest CSC."
+  },
+  {
+    "id": "mgnrega",
+    "name": "MGNREGA Employment Guarantee",
+    "category": "Employment",
+    "description": "Guarantees 100 days of wage employment per year to rural households.",
+    "apply_url": "https://nrega.nic.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 18,
+      "age_max": 65,
+      "gender": "any",
+      "occupation": ["unemployed", "unorganized_sector"],
+      "income_max": 250000,
+      "exclusions": []
+    },
+    "benefits": "100 days guaranteed wage employment per year as per state rates.",
+    "documents_required": [
+      "Gram Panchayat Job Card Application Form",
+      "Aadhaar Card of All Adult Applicants",
+      "Rural Address / Residence Certificate",
+      "Bank / Post Office Account Passbook Copy"
+    ],
+    "how_to_apply": "Apply for Job Card at Gram Panchayat office."
+  },
+  {
+    "id": "pm_svanidhi",
+    "name": "PM SVANidhi Scheme (Street Vendors)",
+    "category": "Employment",
+    "description": "Micro-credit facility offering affordable collateral-free working capital loans to street vendors.",
+    "apply_url": "https://pmsvanidhi.mohua.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["unorganized_sector", "self_employed", "street_vendor"],
+      "age_min": 18,
+      "age_max": 65,
+      "gender": "any",
+      "income_max": 300000,
+      "exclusions": []
+    },
+    "benefits": "Collateral-free working capital loan starting at Rs. 10,000 up to Rs. 50,000.",
+    "documents_required": [
+      "Certificate of Vending (CoV) / ID Card issued by ULB",
+      "Aadhaar Card",
+      "Voter ID / Driving License",
+      "Bank Account Details"
+    ],
+    "how_to_apply": "Apply online at pmsvanidhi.mohua.gov.in or through bank branches."
+  },
+  {
+    "id": "pm_mudra_yojana",
+    "name": "PM Mudra Yojana (PMMY)",
+    "category": "Employment",
+    "description": "Collateral-free business loans up to Rs. 10 Lakhs for non-corporate, non-farm small and micro enterprises.",
+    "apply_url": "https://www.mudra.org.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["self_employed", "artisan", "unorganized_sector"],
+      "age_min": 18,
+      "age_max": 65,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": ["bank_defaulter"]
+    },
+    "benefits": "Collateral-free business loans under Shishu (up to 50k), Kishore (50k-5L), and Tarun (5L-10L) categories.",
+    "documents_required": [
+      "Duly Filled Mudra Loan Application Form",
+      "Business Identity & Address Proof (GST / Trade License)",
+      "Applicant Aadhaar Card & PAN Card",
+      "Last 6 Months Bank Statement",
+      "Project Report / Business Plan Outline"
+    ],
+    "how_to_apply": "Apply through JanSamarth portal (jansamarth.in) or visit any commercial bank branch."
+  },
+  {
+    "id": "stand_up_india",
+    "name": "Stand-Up India Scheme",
+    "category": "Employment",
+    "description": "Facilitates bank loans between Rs. 10 Lakhs and Rs. 1 Crore to SC/ST and Women entrepreneurs for setting up greenfield enterprises.",
+    "apply_url": "https://www.standupmitra.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["self_employed", "unemployed", "artisan"],
+      "age_min": 18,
+      "age_max": 65,
+      "gender": "female",
+      "income_max": 9999999,
+      "exclusions": ["bank_defaulter"]
+    },
+    "benefits": "Composite loan (Term Loan + Working Capital) from Rs. 10 Lakhs up to Rs. 1 Crore at lowest applicable bank interest rates.",
+    "documents_required": [
+      "Aadhaar Card & PAN Card",
+      "Caste Certificate (For SC/ST Applicants)",
+      "Project Report for Greenfield Enterprise",
+      "Proof of Business Premise Ownership / Rent Lease",
+      "Last 6 Months Bank Statement"
+    ],
+    "how_to_apply": "Apply online at standupmitra.in portal or visit any scheduled commercial bank branch."
+  },
+  {
+    "id": "pm_surya_ghar",
+    "name": "PM Surya Ghar: Muft Bijli Yojana",
+    "category": "Energy",
+    "description": "Central subsidy for rooftop solar installation, providing up to 300 units of free electricity/month.",
+    "apply_url": "https://pmsuryaghar.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "student", "unemployed", "farmer", "unorganized_sector"],
+      "age_min": 18,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Subsidy of Rs. 30,000 to Rs. 78,000 + up to 300 units free electricity per month.",
+    "documents_required": [
+      "Latest Electricity Bill (Matching installation address)",
+      "Roof Ownership Document / Property Tax Receipt",
+      "Aadhaar Card & Canceled Cheque / Bank Passbook",
+      "DISCOM Technical Feasibility Approval Letter"
+    ],
+    "how_to_apply": "Apply online at pmsuryaghar.gov.in."
+  },
+  {
+    "id": "saubhagya_electricity",
+    "name": "PM Saubhagya Yojana (Sahaj Bijli Har Ghar)",
+    "category": "Energy",
+    "description": "Free electricity connections to un-electrified rural households and poor urban families.",
+    "apply_url": "https://saubhagya.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "unemployed", "farmer", "unorganized_sector"],
+      "age_min": 18,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 250000,
+      "exclusions": ["existing_electricity_connection"]
+    },
+    "benefits": "100% Free household electricity service connection along with LED bulbs.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Address / House Possession Proof",
+      "Ration Card / BPL Proof",
+      "Passport Photo"
+    ],
+    "how_to_apply": "Apply during DISCOM electrification camps or at local power distribution office."
+  },
+  {
+    "id": "national_green_hydrogen",
+    "name": "National Green Hydrogen Mission",
+    "category": "Energy",
+    "description": "Incentives and technological support for establishing green hydrogen plants and clean energy infrastructure.",
+    "apply_url": "https://mnre.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["self_employed"],
+      "age_min": 21,
+      "age_max": 65,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Capital expenditure subsidies, PLI incentives, and grid connectivity support for green energy projects.",
+    "documents_required": [
+      "Company / Business Registration Certificate",
+      "PAN Card & GST Registration Details",
+      "Technical Feasibility Project Report",
+      "Environmental Clearance Proof"
+    ],
+    "how_to_apply": "Submit project proposal online through Ministry of New and Renewable Energy (MNRE) portal."
+  },
+  {
+    "id": "ujala_energy_efficiency",
+    "name": "UJALA Energy Efficient Appliances Scheme",
+    "category": "Energy",
+    "description": "Distribution of LED bulbs, energy-efficient ceiling fans, and tube lights at heavily subsidized rates.",
+    "apply_url": "https://www.eeslindia.org",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "student", "farmer", "unemployed"],
+      "age_min": 18,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Up to 70% discount on high-efficiency 9W LED bulbs and 5-Star rated appliances with 3-year warranty.",
+    "documents_required": [
+      "Copy of Recent Electricity Bill",
+      "Aadhaar Card or Photo ID Proof"
+    ],
+    "how_to_apply": "Purchase directly from authorized EESL / DISCOM distribution counters."
+  },
+  {
+    "id": "pmay_housing",
+    "name": "Pradhan Mantri Awas Yojana (PMAY)",
+    "category": "Housing",
+    "description": "Financial assistance and credit-linked interest subsidy for constructing or purchasing a pucca house.",
+    "apply_url": "https://pmaymis.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "unemployed", "farmer", "unorganized_sector", "self_employed"],
+      "age_min": 18,
+      "age_max": 70,
+      "gender": "any",
+      "income_max": 600000,
+      "exclusions": ["pucca_house_owner"]
+    },
+    "benefits": "Financial grant up to Rs. 1.2 Lakh (Rural) or interest subsidy up to Rs. 2.67 Lakh (Urban).",
+    "documents_required": [
+      "Aadhaar Card of All Family Members",
+      "Sworn Affidavit of Not Owning a Pucca House",
+      "Income Certificate issued by Revenue Officer",
+      "Bank Account Passbook Details",
+      "Land Ownership Proof / Land Receipt (For Rural Construction)"
+    ],
+    "how_to_apply": "Apply online at pmaymis.gov.in or through Gram Panchayat / Urban Local Body."
+  },
+  {
+    "id": "jan_dhan",
+    "name": "Pradhan Mantri Jan Dhan Yojana (PMJDY)",
+    "category": "Financial Inclusion",
+    "description": "Zero-balance bank account with accidental insurance and overdraft facility.",
+    "apply_url": "https://pmjdy.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "student", "farmer", "unemployed"],
+      "age_min": 10,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Zero balance account, Rs. 2 Lakh accident insurance, Rs. 10,000 overdraft facility.",
+    "documents_required": [
+      "Aadhaar Card (Mandatory OVD)",
+      "PAN Card / Form 60",
+      "2 Passport Size Photographs",
+      "Voter ID / NREGA Job Card (If Aadhaar address is not current)"
+    ],
+    "how_to_apply": "Visit any bank branch or Bank Mitra kiosk."
+  },
+  {
+    "id": "pm_jeevan_jyoti_bima",
+    "name": "PM Jeevan Jyoti Bima Yojana (PMJJBY)",
+    "category": "Financial Inclusion",
+    "description": "Low-cost life insurance scheme providing Rs. 2 Lakh life risk cover for an annual premium.",
+    "apply_url": "https://www.jansuraksha.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 18,
+      "age_max": 50,
+      "gender": "any",
+      "occupation": ["any", "farmer", "unemployed", "student"],
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Life insurance cover of Rs. 2,00,000 in case of death due to any reason.",
+    "documents_required": [
+      "Savings Bank Account Passbook",
+      "Aadhaar Card (Linked with Bank)",
+      "Auto-Debit Consent Form",
+      "Nominee Identity & Age Proof"
+    ],
+    "how_to_apply": "Enroll through Net Banking or visit your savings bank branch."
+  },
+  {
+    "id": "pm_suraksha_bima",
+    "name": "PM Suraksha Bima Yojana (PMSBY)",
+    "category": "Financial Inclusion",
+    "description": "Affordable accidental death and disability insurance coverage of Rs. 2 Lakh for Rs. 20/year.",
+    "apply_url": "https://www.jansuraksha.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "age_min": 18,
+      "age_max": 70,
+      "gender": "any",
+      "occupation": ["any", "farmer", "unemployed", "student"],
+      "income_max": 9999999,
+      "exclusions": []
+    },
+    "benefits": "Rs. 2 Lakh compensation for accidental death or total permanent disability.",
+    "documents_required": [
+      "Aadhaar Card",
+      "Savings Bank Account Passbook",
+      "Signed Auto-Debit Authorization Form",
+      "Nominee Details"
+    ],
+    "how_to_apply": "Subscribe through net banking or submit auto-debit form at bank branch."
+  },
+  {
+    "id": "nfsa_ration",
+    "name": "National Food Security Act - Ration Card (PDS)",
+    "category": "Social Security",
+    "description": "Subsidized foodgrains through the Public Distribution System.",
+    "apply_url": "https://nfsa.gov.in",
+    "eligibility": {
+      "location": "CENTRAL",
+      "occupation": ["any", "farmer", "unemployed"],
+      "age_min": 0,
+      "age_max": 100,
+      "gender": "any",
+      "income_max": 200000,
+      "exclusions": ["income_tax_payer"]
+    },
+    "benefits": "5 kg foodgrains per person per month at highly subsidized rates.",
+    "documents_required": [
+      "Aadhaar Card of All Family Members",
+      "Income Certificate issued by Revenue Authority",
+      "Residence Proof (Electricity Bill / Water Bill / Rent Agreement)",
+      "Joint Family Passport Size Photograph"
+    ],
+    "how_to_apply": "Apply at local PDS office or state food portal."
+  }
+]
