@@ -341,6 +341,75 @@ function closeModal() {
   if (modal) modal.classList.add('hidden');
 }
 
+/* ================= ELIGIBILITY WIZARD MODAL FUNCTIONS ================= */
+
+function openEligibilityModal() {
+  const modal = document.getElementById('eligibilityModal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeEligibilityModal() {
+  const modal = document.getElementById('eligibilityModal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function resetEligibilityForm() {
+  const form = document.getElementById('eligibilityForm');
+  if (form) form.reset();
+  
+  const resultsDiv = document.getElementById('eligibilityResults');
+  if (resultsDiv) resultsDiv.classList.add('hidden');
+  
+  const listDiv = document.getElementById('matchedSchemesList');
+  if (listDiv) listDiv.innerHTML = '';
+}
+
+async function calculateEligibility(event) {
+  event.preventDefault();
+  
+  const age = document.getElementById('userAge') ? document.getElementById('userAge').value : 0;
+  const gender = document.getElementById('userGender') ? document.getElementById('userGender').value : 'any';
+  const state = document.getElementById('userState') ? document.getElementById('userState').value : 'ALL';
+  const occupation = document.getElementById('userOccupation') ? document.getElementById('userOccupation').value : 'any';
+  const income = document.getElementById('userIncome') ? document.getElementById('userIncome').value : 9999999;
+
+  const resultsDiv = document.getElementById('eligibilityResults');
+  const listDiv = document.getElementById('matchedSchemesList');
+  const countHeader = document.getElementById('resultsCountHeader');
+
+  if (resultsDiv) resultsDiv.classList.remove('hidden');
+  if (listDiv) listDiv.innerHTML = `<p class="text-center text-slate-400 py-4"><i class="fa-solid fa-spinner fa-spin text-emerald-600 mr-2"></i>Checking eligible schemes...</p>`;
+
+  try {
+    const response = await fetch('/api/check-eligibility', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ age, gender, state, occupation, income })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.matched_schemes && data.matched_schemes.length > 0) {
+      if (countHeader) countHeader.innerText = `${data.matched_schemes.length} Eligible Schemes Found`;
+      
+      listDiv.innerHTML = data.matched_schemes.map(s => `
+        <div onclick="closeEligibilityModal(); openModal('${s.id}')" class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/30 transition flex justify-between items-center">
+          <div>
+            <h5 class="font-bold text-slate-800 text-xs">${s.name || s.title}</h5>
+            <p class="text-[10px] text-emerald-700 font-semibold">${s.benefits || s.benefit || 'Welfare Scheme'}</p>
+          </div>
+          <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">Apply →</span>
+        </div>
+      `).join('');
+    } else {
+      if (countHeader) countHeader.innerText = 'No Schemes Found';
+      listDiv.innerHTML = `<p class="text-center text-slate-500 py-3">No direct schemes found matching your criteria. Try adjusting the income or state selection.</p>`;
+    }
+  } catch (err) {
+    if (listDiv) listDiv.innerHTML = `<p class="text-center text-red-500 py-3">Error fetching eligibility. Please try again.</p>`;
+  }
+}
+
 function askBotAbout(schemeName) {
   closeModal();
   switchTab('ai');
