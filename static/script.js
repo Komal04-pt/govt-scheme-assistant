@@ -301,39 +301,65 @@ function openModal(schemeId) {
   const title = scheme.name || scheme.title || "Government Scheme";
   const desc = scheme.description || scheme.desc || "";
   const benefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
-  const applySteps = scheme.how_to_apply || scheme.eligibility_desc || "Visit official portal or nearest Jan Seva Kendra.";
+  
+  const eligibility = scheme.eligibility_desc || scheme.eligibility?.criteria || scheme.eligibility || "Citizens meeting state/central income and age criteria.";
+  
+  let docsList = "";
+  if (Array.isArray(scheme.documents)) {
+    docsList = scheme.documents.join(", ");
+  } else if (typeof scheme.documents === 'string') {
+    docsList = scheme.documents;
+  } else {
+    docsList = "Identity Proof, Bank Passbook, Income Certificate, Passport Size Photo";
+  }
 
+  const applySteps = scheme.how_to_apply || "Visit official portal or nearest Jan Seva Kendra / District Social Welfare Office.";
   const applyUrl = scheme.apply_url || `https://www.google.com/search?q=${encodeURIComponent(title + " official portal apply online")}`;
   const bookmarked = isBookmarked(scheme.id);
 
   if (modalContent) {
     modalContent.innerHTML = `
       <div class="flex justify-between items-center pr-6 mb-3">
-        <span class="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded">${scheme.category || 'General'}</span>
+        <span class="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">${scheme.category || 'General'}</span>
         
-        <button onclick="toggleBookmark(event, '${scheme.id}'); openModal('${scheme.id}');" class="text-xs font-semibold px-2.5 py-1 rounded transition ${bookmarked ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
+        <button onclick="toggleBookmark(event, '${scheme.id}'); openModal('${scheme.id}');" class="text-xs font-semibold px-2.5 py-1 rounded-md transition ${bookmarked ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
           ${bookmarked ? '★ Saved' : '☆ Save Scheme'}
         </button>
       </div>
 
-      <h3 class="text-lg font-bold text-slate-900">${title}</h3>
-      <p class="text-xs text-slate-600 mt-1">${desc}</p>
+      <h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">${title}</h3>
+      <p class="text-xs text-slate-600 mt-1 leading-relaxed">${desc}</p>
       
-      <div class="my-3 bg-emerald-50 border border-emerald-200 p-3 rounded-xl text-xs">
-        <p class="font-bold text-emerald-800">Benefit:</p>
-        <p class="text-emerald-900 font-bold text-sm mt-0.5">${benefit}</p>
+      <div class="my-3 bg-emerald-50/80 border border-emerald-200 p-3 rounded-xl text-xs">
+        <p class="font-bold text-emerald-800 flex items-center gap-1.5">
+          <i class="fa-solid fa-gift text-emerald-600"></i> Key Benefit:
+        </p>
+        <p class="text-emerald-950 font-bold text-xs sm:text-sm mt-0.5 leading-snug">${benefit}</p>
       </div>
 
-      <div class="space-y-3 text-xs text-slate-700">
-        <p><strong>Application Guide:</strong> ${applySteps}</p>
+      <div class="space-y-2.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/80 my-3">
+        <div>
+          <strong class="text-slate-900 font-bold block mb-0.5"><i class="fa-solid fa-user-check text-slate-500 mr-1"></i> Eligibility Criteria:</strong>
+          <p class="text-slate-600 text-[11px] leading-relaxed">${eligibility}</p>
+        </div>
+
+        <div>
+          <strong class="text-slate-900 font-bold block mb-0.5"><i class="fa-solid fa-file-lines text-slate-500 mr-1"></i> Required Documents:</strong>
+          <p class="text-slate-600 text-[11px] leading-relaxed">${docsList}</p>
+        </div>
+
+        <div>
+          <strong class="text-slate-900 font-bold block mb-0.5"><i class="fa-solid fa-circle-info text-slate-500 mr-1"></i> How to Apply:</strong>
+          <p class="text-slate-600 text-[11px] leading-relaxed">${applySteps}</p>
+        </div>
       </div>
 
-      <div class="mt-5 flex flex-col sm:flex-row gap-2">
-        <button onclick="askBotAbout('${title.replace(/'/g, "\\'")}')" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs py-2.5 rounded-xl font-bold transition">
-          Ask AI Assistant
+      <div class="mt-4 flex flex-col sm:flex-row gap-2">
+        <button onclick="askBotAbout('${title.replace(/'/g, "\\'")}')" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-robot"></i> Ask AI Assistant
         </button>
-        <a href="${applyUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-slate-900 hover:bg-slate-800 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-1">
-          Apply Official Portal ↗
+        <a href="${applyUrl}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-slate-900 hover:bg-slate-800 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
+          Apply Official Portal <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
         </a>
       </div>
     `;
