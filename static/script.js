@@ -118,7 +118,7 @@ function onGlobalStateChange() {
 function isSchemeMatchState(scheme, targetStateCode) {
   if (!targetStateCode || targetStateCode === 'ALL') return true;
 
-  const rawLocation = (scheme.eligibility?.location || scheme.state || 'CENTRAL').toString().toUpperCase().trim();
+  const rawLocation = (scheme.location || scheme.eligibility?.location || scheme.state || 'CENTRAL').toString().toUpperCase().trim();
 
   if (CENTRAL_KEYWORDS.includes(rawLocation)) return true;
 
@@ -127,7 +127,7 @@ function isSchemeMatchState(scheme, targetStateCode) {
 }
 
 function buildSchemeCardHtml(scheme, styleVariant, searchVal = '') {
-  const rawLoc = (scheme.eligibility?.location || scheme.state || 'CENTRAL').toString().toUpperCase().trim();
+  const rawLoc = (scheme.location || scheme.eligibility?.location || scheme.state || 'CENTRAL').toString().toUpperCase().trim();
   const isCentral = CENTRAL_KEYWORDS.includes(rawLoc);
 
   const badgeClass = isCentral
@@ -251,6 +251,10 @@ function filterByCategory(cat) {
 
 function selectStatePortal(stateCode) {
   currentGlobalState = stateCode;
+
+  const stateSelect = document.getElementById('globalStateSelect');
+  if (stateSelect) stateSelect.value = stateCode;
+
   const container = document.getElementById('stateSpecificGrid');
   if (!container) return;
 
@@ -340,8 +344,6 @@ function closeModal() {
   const modal = document.getElementById('schemeModal');
   if (modal) modal.classList.add('hidden');
 }
-
-/* ================= ELIGIBILITY WIZARD MODAL FUNCTIONS ================= */
 
 function openEligibilityModal() {
   const modal = document.getElementById('eligibilityModal');
