@@ -67,6 +67,7 @@ function toggleBookmark(event, schemeId) {
 
 function highlightText(text, query) {
   if (!text) return '';
+  if (typeof text !== 'string') text = String(text);
   if (!query || query.trim() === '') return text;
 
   const safeQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -289,6 +290,21 @@ function selectStatePortal(stateCode) {
   });
 }
 
+// Helper function to extract text cleanly from strings, arrays, or objects
+function formatFieldContent(data) {
+  if (!data) return null;
+  if (typeof data === 'string') return data.trim();
+  if (Array.isArray(data)) {
+    return data.map(item => typeof item === 'object' ? JSON.stringify(item) : item).join(', ');
+  }
+  if (typeof data === 'object') {
+    return Object.entries(data)
+      .map(([key, val]) => `${key.replace(/_/g, ' ')}: ${typeof val === 'object' ? JSON.stringify(val) : val}`)
+      .join('; ');
+  }
+  return String(data);
+}
+
 function openModal(schemeId) {
   const scheme = SCHEMES_DATABASE.find(s => String(s.id) === String(schemeId));
   if (!scheme) return;
@@ -302,18 +318,18 @@ function openModal(schemeId) {
   const desc = scheme.description || scheme.desc || "";
   const benefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
   
-  const eligibility = scheme.eligibility_desc || scheme.eligibility?.criteria || scheme.eligibility || "Citizens meeting state/central income and age criteria.";
-  
-  let docsList = "";
-  if (Array.isArray(scheme.documents)) {
-    docsList = scheme.documents.join(", ");
-  } else if (typeof scheme.documents === 'string') {
-    docsList = scheme.documents;
-  } else {
-    docsList = "Identity Proof, Bank Passbook, Income Certificate, Passport Size Photo";
-  }
+  // Format Eligibility
+  const rawEligibility = scheme.eligibility_desc || scheme.eligibility_criteria || scheme.eligibility?.criteria || scheme.eligibility;
+  const eligibility = formatFieldContent(rawEligibility) || "Eligible citizens based on state/central guidelines.";
 
-  const applySteps = scheme.how_to_apply || "Visit official portal or nearest Jan Seva Kendra / District Social Welfare Office.";
+  // Format Required Documents cleanly without [object Object]
+  const rawDocs = scheme.documents_required || scheme.documents || scheme.required_documents || scheme.docs;
+  const docsList = formatFieldContent(rawDocs) || "Check official portal for specific required documents.";
+
+  // Format How to Apply
+  const rawApply = scheme.how_to_apply || scheme.application_process || scheme.apply_process;
+  const applySteps = formatFieldContent(rawApply) || "Visit official portal or nearest Jan Seva Kendra.";
+
   const applyUrl = scheme.apply_url || `https://www.google.com/search?q=${encodeURIComponent(title + " official portal apply online")}`;
   const bookmarked = isBookmarked(scheme.id);
 
