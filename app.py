@@ -15,7 +15,6 @@ from voice import transcribe_audio, synthesize_speech
 
 app = FastAPI(title="JanSeva AI Assistant")
 
-# Add CORS Middleware for production deployments
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -24,7 +23,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Custom Middleware to force-disable static asset caching across mobile & desktop browsers
 @app.middleware("http")
 async def add_no_cache_headers(request: Request, call_next):
     response = await call_next(request)
@@ -34,18 +32,17 @@ async def add_no_cache_headers(request: Request, call_next):
         response.headers["Expires"] = "0"
     return response
 
-# In-memory session store
 SESSIONS = {}
 
 STATE_MAP = {
-    'BR': 'bihar',
-    'RJ': 'rajasthan',
-    'UP': 'uttar pradesh',
-    'MP': 'madhya pradesh',
-    'DL': 'delhi',
-    'MH': 'maharashtra',
-    'KA': 'karnataka',
-    'WB': 'west bengal'
+    'BR': 'br',
+    'RJ': 'rj',
+    'UP': 'up',
+    'MP': 'mp',
+    'DL': 'dl',
+    'MH': 'mh',
+    'KA': 'ka',
+    'WB': 'wb'
 }
 
 class ChatRequest(BaseModel):
@@ -114,14 +111,15 @@ async def get_filtered_schemes(state: str = "ALL"):
     if state.upper() == "ALL":
         return JSONResponse(all_schemes)
 
-    target_state = STATE_MAP.get(state.upper(), state.lower())
+    target_code = state.upper()
+    target_lower = STATE_MAP.get(target_code, state.lower())
     filtered = []
 
     for s in all_schemes:
         elig = s.get('eligibility', {})
         loc = str(elig.get('location', s.get('state', 'CENTRAL'))).lower()
         
-        if loc in ['central', 'all', 'all india'] or loc == target_state or loc == state.lower():
+        if loc in ['central', 'all', 'all india'] or loc == target_code.lower() or loc == target_lower:
             filtered.append(s)
 
     return JSONResponse(filtered)
@@ -161,7 +159,7 @@ async def check_eligibility_api(request: Request):
                     continue
 
             scheme_loc = str(elig.get('location', scheme.get('state', 'CENTRAL'))).lower()
-            if scheme_loc not in ['central', 'all', 'all india'] and user_state_raw != 'ALL' and scheme_loc != user_state:
+            if scheme_loc not in ['central', 'all', 'all india'] and user_state_raw != 'ALL' and scheme_loc != user_state and scheme_loc != user_state_raw.lower():
                 continue
 
             allowed_occ = elig.get('occupation', ['any'])

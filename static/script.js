@@ -11,7 +11,6 @@ const quickRepliesEl = document.getElementById('quickReplies');
 
 const DEFAULT_QUICK_REPLIES = ['Bihar Student Credit Card', 'PM Kisan Scheme', 'Old Age Pension Eligibility'];
 
-// State Code & Name Mapping Matrix
 const STATE_LOOKUP = {
   'BR': ['BR', 'BIHAR'],
   'RJ': ['RJ', 'RAJASTHAN'],
@@ -21,6 +20,17 @@ const STATE_LOOKUP = {
   'MH': ['MH', 'MAHARASHTRA'],
   'KA': ['KA', 'KARNATAKA'],
   'WB': ['WB', 'WEST BENGAL']
+};
+
+const STATE_NAMES = {
+  'BR': 'Bihar',
+  'RJ': 'Rajasthan',
+  'UP': 'Uttar Pradesh',
+  'MP': 'Madhya Pradesh',
+  'DL': 'Delhi',
+  'MH': 'Maharashtra',
+  'KA': 'Karnataka',
+  'WB': 'West Bengal'
 };
 
 const CENTRAL_KEYWORDS = ['CENTRAL', 'ALL', 'ALL INDIA', 'NATIONAL', 'INDIA'];
@@ -74,7 +84,6 @@ async function fetchSchemesFromBackend() {
       SCHEMES_DATABASE = await res.json();
     }
   } catch (err) {
-    console.error("Error loading schemes:", err);
     SCHEMES_DATABASE = [];
   }
 
@@ -111,25 +120,27 @@ function isSchemeMatchState(scheme, targetStateCode) {
 
   const rawLocation = (scheme.eligibility?.location || scheme.state || 'CENTRAL').toString().toUpperCase().trim();
 
-  // 1. Central / National schemes always included
   if (CENTRAL_KEYWORDS.includes(rawLocation)) return true;
 
-  // 2. Exact match on state code or state full name
   const validNames = STATE_LOOKUP[targetStateCode] || [targetStateCode.toUpperCase()];
   return validNames.some(val => rawLocation.includes(val) || val.includes(rawLocation));
 }
 
 function buildSchemeCardHtml(scheme, styleVariant, searchVal = '') {
-  const badgeClass = styleVariant === 'state'
-    ? 'text-[9px] font-bold uppercase text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded'
-    : 'text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded';
+  const rawLoc = (scheme.eligibility?.location || scheme.state || 'CENTRAL').toString().toUpperCase().trim();
+  const isCentral = CENTRAL_KEYWORDS.includes(rawLoc);
+
+  const badgeClass = isCentral
+    ? 'text-[10px] px-2 py-0.5 rounded uppercase font-semibold border border-slate-200 bg-slate-100 text-slate-700'
+    : 'text-[10px] px-2 py-0.5 rounded uppercase font-bold border border-emerald-200 bg-emerald-100 text-emerald-800';
+
   const ctaLabel = styleVariant === 'state' ? 'Apply →' : 'Details →';
   const ctaClass = styleVariant === 'state' ? 'text-xs text-emerald-800 font-semibold' : 'text-xs text-blue-600 font-semibold';
 
   const schemeTitle = scheme.name || scheme.title || "Government Scheme";
   const schemeDesc = scheme.description || scheme.desc || "";
   const schemeBenefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
-  const schemeState = scheme.eligibility?.location || scheme.state || "CENTRAL";
+  const schemeState = isCentral ? 'CENTRAL' : (STATE_NAMES[rawLoc] || rawLoc);
   
   const bookmarked = isBookmarked(scheme.id);
 
@@ -140,9 +151,9 @@ function buildSchemeCardHtml(scheme, styleVariant, searchVal = '') {
   return `
     <div>
       <div class="flex justify-between items-center mb-2">
-        <div class="flex items-center gap-1.5">
-          <span class="${badgeClass}">${scheme.category || 'General'}</span>
-          <span class="text-[10px] font-bold text-slate-700 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">${schemeState}</span>
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[10px] font-bold uppercase tracking-wider bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded">${scheme.category || 'General'}</span>
+          <span class="${badgeClass}">${schemeState}</span>
         </div>
         <button onclick="toggleBookmark(event, '${scheme.id}')" class="text-xs font-semibold px-2 py-0.5 rounded transition ${bookmarked ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-slate-100 text-slate-400 hover:text-slate-600'}" title="${bookmarked ? 'Remove Bookmark' : 'Save Scheme'}">
           ${bookmarked ? '★ Saved' : '☆ Save'}
@@ -152,7 +163,7 @@ function buildSchemeCardHtml(scheme, styleVariant, searchVal = '') {
       <p class="text-xs text-slate-500 mt-1 ${styleVariant === 'state' ? '' : 'line-clamp-2'}">${highlightedDesc}</p>
     </div>
     <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
-      <span class="font-bold text-emerald-700">${highlightedBenefit}</span>
+      <span class="font-bold text-emerald-700 line-clamp-1">${highlightedBenefit}</span>
       <span class="${ctaClass}">${ctaLabel}</span>
     </div>
   `;
@@ -254,16 +265,9 @@ function selectStatePortal(stateCode) {
     activeCard.classList.add('border-emerald-600', 'bg-emerald-50', 'ring-2', 'ring-emerald-500/20');
   }
 
-  const stateNames = { 
-    'BR': 'Bihar', 'RJ': 'Rajasthan', 'UP': 'Uttar Pradesh', 
-    'MP': 'Madhya Pradesh', 'DL': 'Delhi', 'MH': 'Maharashtra', 
-    'KA': 'Karnataka', 'WB': 'West Bengal' 
-  };
-  
   const titleEl = document.getElementById('statePortalTitle');
-  if (titleEl) titleEl.innerText = `${stateNames[stateCode] || stateCode} & Central Schemes`;
+  if (titleEl) titleEl.innerText = `${STATE_NAMES[stateCode] || stateCode} & Central Schemes`;
 
-  // Always combines State Schemes + Central Schemes
   const stateSchemes = SCHEMES_DATABASE.filter(s => isSchemeMatchState(s, stateCode));
 
   container.innerHTML = '';
