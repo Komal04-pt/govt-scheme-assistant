@@ -562,19 +562,44 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
     div.textContent = text;
   }
 
-  if (audioUrl) {
+  // Audio Playback Handler with Web Speech API Fallback
+  if (sender === 'bot' && !isLoading) {
     const audioContainer = document.createElement('div');
     audioContainer.className = 'mt-3 pt-2 border-t border-slate-100 flex items-center gap-2';
-    
-    const audioEl = document.createElement('audio');
-    audioEl.className = 'w-full h-8';
-    audioEl.controls = true;
-    audioEl.src = audioUrl;
-    
-    audioContainer.appendChild(audioEl);
+
+    if (audioUrl && audioUrl.trim() !== '') {
+      // 1. Play Backend Audio if URL is generated
+      const audioEl = document.createElement('audio');
+      audioEl.className = 'w-full h-8';
+      audioEl.controls = true;
+      audioEl.src = audioUrl;
+      audioContainer.appendChild(audioEl);
+      audioEl.play().catch(e => console.log("Autoplay blocked by browser policy"));
+    } else {
+      // 2. Guaranteed Browser Web Speech Fallback
+      const speakBtn = document.createElement('button');
+      speakBtn.className = 'text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 transition';
+      speakBtn.innerHTML = '🔊 Listen Response';
+      
+      const cleanText = div.innerText || div.textContent;
+      
+      const speak = () => {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          utterance.lang = 'en-IN';
+          window.speechSynthesis.speak(utterance);
+        }
+      };
+
+      speakBtn.onclick = speak;
+      audioContainer.appendChild(speakBtn);
+
+      // Trigger automatic voice playback
+      speak();
+    }
+
     div.appendChild(audioContainer);
-    
-    audioEl.play().catch(e => console.log("Autoplay blocked by browser policy"));
   }
 
   wrapper.appendChild(div);
