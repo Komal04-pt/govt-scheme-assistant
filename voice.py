@@ -1,33 +1,17 @@
-"""
-Voice layer: Speech-to-Text (STT) and Text-to-Speech (TTS).
-
-STT: Groq's hosted Whisper (whisper-large-v3) — fast, free-tier, good
-     Hindi/Indian-language support, returns both transcript and detected
-     language.
-TTS: gTTS (Google Text-to-Speech) — free, simple, supports Hindi and
-     English well. Swap for AI4Bharat Indic-TTS later for more languages
-     or a more natural rural-accent voice.
-
-Design note: this layer is intentionally decoupled from agent.py — the
-agent still just sees plain text messages. Voice is purely an input/output
-adapter on top of the same text pipeline, so the core agent logic doesn't
-need to change to support voice.
-"""
-
 import os
 import io
+import re
 import uuid
-import tempfile
-
 from groq import Groq
 from gtts import gTTS
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-# Our internal language labels -> gTTS language codes
 LANG_TO_TTS_CODE = {
     "hindi": "hi",
+    "hindi_devanagari": "hi",
+    "hinglish": "hi",
     "english": "en",
 }
 
@@ -35,43 +19,64 @@ AUDIO_OUT_DIR = os.path.join(os.path.dirname(__file__), "static", "audio")
 os.makedirs(AUDIO_OUT_DIR, exist_ok=True)
 
 
+def _clean_text_for_tts(text: str) -> str:
+    if not text:
+        return ""
+    text = re.sub(r'http\S+|www\.\S+', '', text)
+    text = re.sub(r'[*#_\\`~]', '', text)
+    text = re.sub(r'^\s*[-+]\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+
 def transcribe_audio(audio_bytes: bytes, filename: str = "input.webm") -> dict:
-    """
-    Sends audio to Groq Whisper for transcription.
-    Returns {"text": str, "language": "hindi"/"english"/other}
-    """
-    # Groq SDK expects a file-like object with a name attribute for format detection
-    audio_file = io.BytesIO(audio_bytes)
-    audio_file.name = filename
+    try:
+        audio_file = io.BytesIO(audio_bytes)
+        audio_file.name = filename
 
-    transcription = groq_client.audio.transcriptions.create(
-        file=audio_file,
-        model="whisper-large-v3",
-        response_format="verbose_json",  # includes detected "language"
-    )
+        transcription = groq_client.audio.transcriptions.create(
+            file=audio_file,
+            model="whisper-large-v3",
+            response_format="verbose_json",
+        )
 
-    detected_lang_raw = getattr(transcription, "language", "") or ""
-    # Whisper returns full language names like "hindi", "english" already in most cases
-    language = "hindi" if "hi" in detected_lang_raw.lower() else "english"
+        raw_text = transcription.text.strip() if hasattr(transcription, "text") else ""
+        detected_lang_raw = getattr(transcription, "language", "") or ""
 
-    return {"text": transcription.text.strip(), "language": language}
+        if "hi" in detected_lang_raw.lower() or any('\u0900' <= char <= '\u097F' for char in raw_text):
+            language = "hindi_devanagari"
+        elif any(w in raw_text.lower() for w in ["hai", "hoon", "kaise", "aap", "chahiye"]):
+            language = "hinglish"
+        else:
+            language = "english"
+
+        return {"text": raw_text, "language": language}
+
+    except Exception as e:
+        print("Transcription Exception:", str(e))
+        return {"text": "", "language": "english"}
 
 
 def synthesize_speech(text: str, language: str = "english") -> str:
-    """
-    Converts text to speech using gTTS, saves an mp3 file, and returns
-    the relative URL path to serve it from /static/audio/.
-    """
-    lang_code = LANG_TO_TTS_CODE.get(language, "en")
+    try:
+        clean_text = _clean_text_for_tts(text)
+        if not clean_text:
+            return ""
 
-    # gTTS can choke on very long text; keep it reasonably capped for a
-    # snappy voice response (full text is still shown/available as text).
-    speech_text = text if len(text) < 1500 else text[:1500]
+        lang_code = LANG_TO_TTS_CODE.get(language, "hi" if any('\u0900' <= c <= '\u097F' for c in clean_text) else "en")
+        speech_text = clean_text[:1200]
 
-    tts = gTTS(text=speech_text, lang=lang_code, slow=False)
+        if lang_code == "en":
+            tts = gTTS(text=speech_text, lang="en", tld="co.in", slow=False)
+        else:
+            tts = gTTS(text=speech_text, lang="hi", slow=False)
 
-    filename = f"{uuid.uuid4().hex}.mp3"
-    filepath = os.path.join(AUDIO_OUT_DIR, filename)
-    tts.save(filepath)
+        filename = f"{uuid.uuid4().hex}.mp3"
+        filepath = os.path.join(AUDIO_OUT_DIR, filename)
+        tts.save(filepath)
 
-    return f"/static/audio/{filename}"
+        return f"/static/audio/{filename}"
+
+    except Exception as e:
+        print("Synthesize Speech Exception:", str(e))
+        return ""

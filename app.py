@@ -14,7 +14,6 @@ from pydantic import BaseModel
 from agent import run_agent
 from voice import transcribe_audio, synthesize_speech
 
-# Set up logging to track server errors in Render logs
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -222,7 +221,6 @@ async def voice_chat(session_id: str = Form(default=""), audio: UploadFile = Fil
         if not audio_bytes:
             return JSONResponse({'error': 'Empty audio payload'}, status_code=400)
 
-        # 1. Speech to Text Transcription
         try:
             stt_result = transcribe_audio(audio_bytes, filename=audio.filename or "input.webm")
             if isinstance(stt_result, dict):
@@ -246,10 +244,8 @@ async def voice_chat(session_id: str = Form(default=""), audio: UploadFile = Fil
                 "language": language
             }
 
-        # 2. Agent Execution
         result = _run_turn(session_id, transcript)
 
-        # 3. Text to Speech Synthesis
         audio_url = ""
         try:
             audio_url = synthesize_speech(result.get("reply", ""), language=result.get("language", "english")) or ""
