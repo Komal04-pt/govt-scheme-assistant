@@ -280,7 +280,7 @@ function selectStatePortal(stateCode) {
       const rawLocB = (b.location || b.eligibility?.location || b.state || 'CENTRAL').toString().toUpperCase().trim();
       const isCentralA = CENTRAL_KEYWORDS.includes(rawLocA);
       const isCentralB = CENTRAL_KEYWORDS.includes(rawLocB);
-      return isCentralA - isCentralB; // state-specific pehle, central baad me
+      return isCentralA - isCentralB; // state-specific pehle (0), central baad me (1)
     });
 
   container.innerHTML = '';
@@ -346,7 +346,7 @@ function formatEligibility(data) {
     bullets.push(`<strong>Target Occupation:</strong> ${occStr}`);
   }
 
-  // Check if exclusions exist and are not empty
+  // Check if exclusions exist and are not empty before rendering bullet point
   if (parsedObj.exclusions) {
     let exc = parsedObj.exclusions;
     if (typeof exc === 'string') {
@@ -600,10 +600,12 @@ async function toggleRecording() {
 
       let options = {};
       if (typeof MediaRecorder !== 'undefined') {
-        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-          options = { mimeType: 'audio/webm;codecs=opus' };
+        if (MediaRecorder.isTypeSupported('audio/webm')) {
+          options = { mimeType: 'audio/webm' };
         } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
           options = { mimeType: 'audio/mp4' };
+        } else if (MediaRecorder.isTypeSupported('audio/wav')) {
+          options = { mimeType: 'audio/wav' };
         }
       }
 
@@ -626,7 +628,7 @@ async function toggleRecording() {
         }
       };
 
-      mediaRecorder.start(100);
+      mediaRecorder.start(200);
       isRecording = true;
 
       if (micBtn) {
@@ -656,11 +658,17 @@ async function sendVoiceMessage(audioBlob) {
 
   try {
     const formData = new FormData();
-    const ext = audioBlob.type.includes('mp4') ? 'mp4' : 'webm';
+    const ext = audioBlob.type.includes('mp4') ? 'mp4' : (audioBlob.type.includes('wav') ? 'wav' : 'webm');
     formData.append('audio', audioBlob, `recording.${ext}`);
     formData.append('session_id', sessionId || '');
 
     const res = await fetch('/voice-chat', { method: 'POST', body: formData });
+    
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `Server Status ${res.status}`);
+    }
+
     const data = await res.json();
     sessionId = data.session_id;
 
@@ -674,7 +682,8 @@ async function sendVoiceMessage(audioBlob) {
     }
   } catch (err) {
     if (loadingMsg) loadingMsg.remove();
-    addMessage('Voice processing error.', 'bot');
+    console.error("Voice Processing Error:", err);
+    addMessage(`Voice error: ${err.message || 'Server error during transcription.'}`, 'bot');
   } finally {
     if (sendBtn) sendBtn.disabled = false;
     if (micBtn) micBtn.disabled = false;
