@@ -290,19 +290,97 @@ function selectStatePortal(stateCode) {
   });
 }
 
-// Extract content cleanly without [object Object]
-function formatFieldContent(data) {
-  if (!data) return null;
-  if (typeof data === 'string') return data.trim();
+// Parses raw string/JSON/object eligibility into formatted bullet points
+function formatEligibility(data) {
+  if (!data) return '<p class="text-slate-500 text-[11px]">Eligible citizens meeting state/central guidelines.</p>';
+  
+  let parsedObj = {};
+
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    parsedObj = data;
+  } else if (typeof data === 'string') {
+    try {
+      parsedObj = JSON.parse(data);
+    } catch (e) {
+      const items = {};
+      data.split(';').forEach(pair => {
+        const [k, v] = pair.split(':');
+        if (k && v) items[k.trim().toLowerCase()] = v.trim();
+      });
+      if (Object.keys(items).length > 0) parsedObj = items;
+      else return `<ul class="list-disc list-inside space-y-1 text-slate-600 text-[11px]"><li>${data.trim()}</li></ul>`;
+    }
+  }
+
+  const bullets = [];
+
+  if (parsedObj.location && parsedObj.location !== 'CENTRAL') {
+    bullets.push(`<strong>Location:</strong> ${parsedObj.location}`);
+  }
+
+  if (parsedObj.age_min || parsedObj['age min'] || parsedObj.age_max || parsedObj['age max']) {
+    const min = parsedObj.age_min || parsedObj['age min'] || '18';
+    const max = parsedObj.age_max || parsedObj['age max'] || 'No upper limit';
+    bullets.push(`<strong>Age Limit:</strong> ${min} to ${max} years`);
+  }
+
+  if (parsedObj.income_max || parsedObj['income max'] || parsedObj.income) {
+    const inc = parsedObj.income_max || parsedObj['income max'] || parsedObj.income;
+    const formattedInc = isNaN(inc) ? inc : `₹${Number(inc).toLocaleString('en-IN')} / year`;
+    bullets.push(`<strong>Income Threshold:</strong> Max ${formattedInc}`);
+  }
+
+  if (parsedObj.occupation) {
+    let occ = parsedObj.occupation;
+    if (typeof occ === 'string') {
+      try { occ = JSON.parse(occ); } catch(e) {}
+    }
+    const occStr = Array.isArray(occ) ? occ.map(o => o.replace(/_/g, ' ')).join(', ') : occ.toString().replace(/_/g, ' ');
+    bullets.push(`<strong>Target Occupation:</strong> ${occStr}`);
+  }
+
+  if (parsedObj.exclusions) {
+    let exc = parsedObj.exclusions;
+    if (typeof exc === 'string') {
+      try { exc = JSON.parse(exc); } catch(e) {}
+    }
+    const excStr = Array.isArray(exc) ? exc.map(e => e.replace(/_/g, ' ')).join(', ') : exc.toString().replace(/_/g, ' ');
+    bullets.push(`<strong>Exclusions:</strong> ${excStr}`);
+  }
+
+  if (parsedObj.gender && parsedObj.gender.toLowerCase() !== 'any') {
+    bullets.push(`<strong>Gender Preference:</strong> ${parsedObj.gender}`);
+  }
+
+  if (bullets.length === 0) {
+    return `<ul class="list-disc list-inside space-y-1 text-slate-600 text-[11px]"><li>${typeof data === 'string' ? data : JSON.stringify(data)}</li></ul>`;
+  }
+
+  return `<ul class="list-disc list-inside space-y-1 text-slate-700 text-[11px]">${bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
+}
+
+// Formats document fields cleanly into bullet points
+function formatDocumentsList(data) {
+  if (!data) return '<ul class="list-disc list-inside text-slate-600 text-[11px]"><li>Check official portal for specific required documents.</li></ul>';
+
+  let list = [];
   if (Array.isArray(data)) {
-    return data.map(item => typeof item === 'object' ? JSON.stringify(item) : item).join(', ');
+    list = data;
+  } else if (typeof data === 'string') {
+    if (data.startsWith('[') && data.endsWith(']')) {
+      try { list = JSON.parse(data); } catch(e) { list = data.split(','); }
+    } else {
+      list = data.split(',');
+    }
   }
-  if (typeof data === 'object') {
-    return Object.entries(data)
-      .map(([key, val]) => `${key.replace(/_/g, ' ')}: ${typeof val === 'object' ? JSON.stringify(val) : val}`)
-      .join('; ');
+
+  const cleanList = list.map(item => String(item).trim()).filter(Boolean);
+  
+  if (cleanList.length === 0) {
+    return '<ul class="list-disc list-inside text-slate-600 text-[11px]"><li>Check official portal for specific required documents.</li></ul>';
   }
-  return String(data);
+
+  return `<ul class="list-disc list-inside space-y-1 text-slate-700 text-[11px]">${cleanList.map(doc => `<li>${doc}</li>`).join('')}</ul>`;
 }
 
 function openModal(schemeId) {
@@ -319,20 +397,17 @@ function openModal(schemeId) {
   const benefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
   
   const rawEligibility = scheme.eligibility_desc || scheme.eligibility_criteria || scheme.eligibility?.criteria || scheme.eligibility;
-  const eligibility = formatFieldContent(rawEligibility) || "Eligible citizens based on state/central guidelines.";
+  const eligibilityHtml = formatEligibility(rawEligibility);
 
   const rawDocs = scheme.documents_required || scheme.documents || scheme.required_documents || scheme.docs;
-  const docsList = formatFieldContent(rawDocs) || "Check official portal for specific required documents.";
-
-  const rawApply = scheme.how_to_apply || scheme.application_process || scheme.apply_process;
-  const applySteps = formatFieldContent(rawApply) || "Visit official portal or nearest Jan Seva Kendra.";
+  const docsHtml = formatDocumentsList(rawDocs);
 
   const applyUrl = scheme.apply_url || `https://www.google.com/search?q=${encodeURIComponent(title + " official portal apply online")}`;
   const bookmarked = isBookmarked(scheme.id);
 
   if (modalContent) {
     modalContent.innerHTML = `
-      <div class="flex justify-between items-center pr-6 mb-3">
+      <div class="flex justify-between items-center pr-6 mb-2">
         <span class="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">${scheme.category || 'General'}</span>
         
         <button onclick="toggleBookmark(event, '${scheme.id}'); openModal('${scheme.id}');" class="text-xs font-semibold px-2.5 py-1 rounded-md transition ${bookmarked ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
@@ -343,30 +418,32 @@ function openModal(schemeId) {
       <h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">${title}</h3>
       <p class="text-xs text-slate-600 mt-1 leading-relaxed">${desc}</p>
       
-      <div class="my-3 bg-emerald-50/80 border border-emerald-200 p-3 rounded-xl text-xs">
+      <!-- Key Benefit Card -->
+      <div class="my-3 bg-emerald-50/90 border border-emerald-200 p-3 rounded-xl text-xs">
         <p class="font-bold text-emerald-800 flex items-center gap-1.5">
           <i class="fa-solid fa-gift text-emerald-600"></i> Key Benefit:
         </p>
         <p class="text-emerald-950 font-bold text-xs sm:text-sm mt-0.5 leading-snug">${benefit}</p>
       </div>
 
-      <div class="space-y-2.5 text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200/80 my-3">
-        <div>
-          <strong class="text-slate-900 font-bold block mb-0.5"><i class="fa-solid fa-user-check text-slate-500 mr-1"></i> Eligibility Criteria:</strong>
-          <p class="text-slate-600 text-[11px] leading-relaxed">${eligibility}</p>
+      <!-- Eligibility & Documents Sections -->
+      <div class="space-y-3 my-3">
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <strong class="text-slate-900 font-bold text-xs flex items-center gap-1.5 mb-2">
+            <i class="fa-solid fa-user-check text-emerald-600"></i> Eligibility Criteria
+          </strong>
+          ${eligibilityHtml}
         </div>
 
-        <div>
-          <strong class="text-slate-900 font-bold block mb-0.5"><i class="fa-solid fa-file-lines text-slate-500 mr-1"></i> Required Documents:</strong>
-          <p class="text-slate-600 text-[11px] leading-relaxed">${docsList}</p>
-        </div>
-
-        <div>
-          <strong class="text-slate-900 font-bold block mb-0.5"><i class="fa-solid fa-circle-info text-slate-500 mr-1"></i> How to Apply:</strong>
-          <p class="text-slate-600 text-[11px] leading-relaxed">${applySteps}</p>
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <strong class="text-slate-900 font-bold text-xs flex items-center gap-1.5 mb-2">
+            <i class="fa-solid fa-file-lines text-blue-600"></i> Required Documents
+          </strong>
+          ${docsHtml}
         </div>
       </div>
 
+      <!-- Action Buttons -->
       <div class="mt-4 flex flex-col sm:flex-row gap-2">
         <button onclick="askBotAbout('${title.replace(/'/g, "\\'")}')" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
           <i class="fa-solid fa-robot"></i> Ask AI Assistant
