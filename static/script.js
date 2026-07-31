@@ -280,7 +280,7 @@ function selectStatePortal(stateCode) {
       const rawLocB = (b.location || b.eligibility?.location || b.state || 'CENTRAL').toString().toUpperCase().trim();
       const isCentralA = CENTRAL_KEYWORDS.includes(rawLocA);
       const isCentralB = CENTRAL_KEYWORDS.includes(rawLocB);
-      return isCentralA - isCentralB; // state-specific pehle (0), central baad me (1)
+      return isCentralA - isCentralB;
     });
 
   container.innerHTML = '';
@@ -346,7 +346,6 @@ function formatEligibility(data) {
     bullets.push(`<strong>Target Occupation:</strong> ${occStr}`);
   }
 
-  // Check if exclusions exist and are not empty before rendering bullet point
   if (parsedObj.exclusions) {
     let exc = parsedObj.exclusions;
     if (typeof exc === 'string') {
@@ -430,7 +429,6 @@ function openModal(schemeId) {
       <h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">${title}</h3>
       <p class="text-xs text-slate-600 mt-1 leading-relaxed">${desc}</p>
       
-      <!-- Key Benefit Card -->
       <div class="my-3 bg-emerald-50/90 border border-emerald-200 p-3 rounded-xl text-xs">
         <p class="font-bold text-emerald-800 flex items-center gap-1.5">
           <i class="fa-solid fa-gift text-emerald-600"></i> Key Benefit:
@@ -438,7 +436,6 @@ function openModal(schemeId) {
         <p class="text-emerald-950 font-bold text-xs sm:text-sm mt-0.5 leading-snug">${benefit}</p>
       </div>
 
-      <!-- Eligibility & Documents Sections -->
       <div class="space-y-3 my-3">
         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
           <strong class="text-slate-900 font-bold text-xs flex items-center gap-1.5 mb-2">
@@ -455,7 +452,6 @@ function openModal(schemeId) {
         </div>
       </div>
 
-      <!-- Action Buttons -->
       <div class="mt-4 flex flex-col sm:flex-row gap-2">
         <button onclick="askBotAbout('${title.replace(/'/g, "\\'")}')" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white text-xs py-2.5 rounded-xl font-bold transition flex items-center justify-center gap-1.5 shadow-sm">
           <i class="fa-solid fa-robot"></i> Ask AI Assistant
@@ -567,12 +563,18 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
   }
 
   if (audioUrl) {
+    const audioContainer = document.createElement('div');
+    audioContainer.className = 'mt-3 pt-2 border-t border-slate-100 flex items-center gap-2';
+    
     const audioEl = document.createElement('audio');
-    audioEl.className = 'w-full mt-2 h-8';
+    audioEl.className = 'w-full h-8';
     audioEl.controls = true;
     audioEl.src = audioUrl;
-    div.appendChild(audioEl);
-    audioEl.play().catch(() => {});
+    
+    audioContainer.appendChild(audioEl);
+    div.appendChild(audioContainer);
+    
+    audioEl.play().catch(e => console.log("Autoplay blocked by browser policy"));
   }
 
   wrapper.appendChild(div);
@@ -727,13 +729,13 @@ async function sendMessage() {
     sessionId = data.session_id;
 
     if (loadingMsg) loadingMsg.remove();
-    addMessage(data.reply || data.response, 'bot');
+    addMessage(data.reply || data.response, 'bot', false, data.audio_url);
   } catch (err) {
     if (loadingMsg) loadingMsg.remove();
     addMessage('AI response error.', 'bot');
   } finally {
     if (sendBtn) sendBtn.disabled = false;
-    inputEl.focus();
+    if (inputEl) inputEl.focus();
   }
 }
 
