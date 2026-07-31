@@ -56,6 +56,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     session_id: str
     reply: str
+    audio_url: str = ""
     profile: dict
     eligible_schemes: list
     possibly_eligible_schemes: list
@@ -198,12 +199,20 @@ def chat(req: ChatRequest):
         session_id = req.session_id or str(uuid.uuid4())
         result = _run_turn(session_id, req.message)
 
+        audio_url = ""
+        try:
+            audio_url = synthesize_speech(result.get("reply", ""), language=result.get("language", "english")) or ""
+        except Exception as tts_err:
+            logger.error(f"TTS Error in /chat: {tts_err}")
+            audio_url = ""
+
         matched = result.get("matched", {})
         eligible_names, possibly_names = _extract_scheme_names(matched)
 
         return ChatResponse(
             session_id=session_id,
             reply=result.get("reply", ""),
+            audio_url=audio_url,
             profile=result.get("profile", {}),
             eligible_schemes=eligible_names,
             possibly_eligible_schemes=possibly_names,
