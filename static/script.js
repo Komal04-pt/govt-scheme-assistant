@@ -562,13 +562,13 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
     div.textContent = text;
   }
 
-  // Audio Playback Handler with Web Speech API Fallback
+  // Audio Playback Handler with Automatic Hindi/English Language Detection
   if (sender === 'bot' && !isLoading) {
     const audioContainer = document.createElement('div');
     audioContainer.className = 'mt-3 pt-2 border-t border-slate-100 flex items-center gap-2';
 
     if (audioUrl && audioUrl.trim() !== '') {
-      // 1. Play Backend Audio if URL is generated
+      // 1. Backend Generated Audio File
       const audioEl = document.createElement('audio');
       audioEl.className = 'w-full h-8';
       audioEl.controls = true;
@@ -576,7 +576,7 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
       audioContainer.appendChild(audioEl);
       audioEl.play().catch(e => console.log("Autoplay blocked by browser policy"));
     } else {
-      // 2. Guaranteed Browser Web Speech Fallback
+      // 2. Multi-lingual Web Speech API Fallback
       const speakBtn = document.createElement('button');
       speakBtn.className = 'text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 transition';
       speakBtn.innerHTML = '🔊 Listen Response';
@@ -587,7 +587,18 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(cleanText);
-          utterance.lang = 'en-IN';
+
+          // Detect Devanagari Hindi Script (\u0900-\u097F)
+          const isHindi = /[\u0900-\u097F]/.test(cleanText);
+          utterance.lang = isHindi ? 'hi-IN' : 'en-IN';
+
+          // Select matching browser voice engine if available
+          const voices = window.speechSynthesis.getVoices();
+          if (isHindi) {
+            const hindiVoice = voices.find(v => v.lang.includes('hi') || v.name.includes('Hindi'));
+            if (hindiVoice) utterance.voice = hindiVoice;
+          }
+
           window.speechSynthesis.speak(utterance);
         }
       };
@@ -595,7 +606,7 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
       speakBtn.onclick = speak;
       audioContainer.appendChild(speakBtn);
 
-      // Trigger automatic voice playback
+      // Auto-trigger browser speech synthesis
       speak();
     }
 
