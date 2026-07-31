@@ -273,7 +273,15 @@ function selectStatePortal(stateCode) {
   const titleEl = document.getElementById('statePortalTitle');
   if (titleEl) titleEl.innerText = `${STATE_NAMES[stateCode] || stateCode} & Central Schemes`;
 
-  const stateSchemes = SCHEMES_DATABASE.filter(s => isSchemeMatchState(s, stateCode));
+  const stateSchemes = SCHEMES_DATABASE
+    .filter(s => isSchemeMatchState(s, stateCode))
+    .sort((a, b) => {
+      const rawLocA = (a.location || a.eligibility?.location || a.state || 'CENTRAL').toString().toUpperCase().trim();
+      const rawLocB = (b.location || b.eligibility?.location || b.state || 'CENTRAL').toString().toUpperCase().trim();
+      const isCentralA = CENTRAL_KEYWORDS.includes(rawLocA);
+      const isCentralB = CENTRAL_KEYWORDS.includes(rawLocB);
+      return isCentralA - isCentralB; // state-specific pehle, central baad me
+    });
 
   container.innerHTML = '';
   if (stateSchemes.length === 0) {
@@ -290,7 +298,6 @@ function selectStatePortal(stateCode) {
   });
 }
 
-// Parses raw string/JSON/object eligibility into formatted bullet points
 function formatEligibility(data) {
   if (!data) return '<p class="text-slate-500 text-[11px]">Eligible citizens meeting state/central guidelines.</p>';
   
@@ -339,13 +346,19 @@ function formatEligibility(data) {
     bullets.push(`<strong>Target Occupation:</strong> ${occStr}`);
   }
 
+  // Check if exclusions exist and are not empty
   if (parsedObj.exclusions) {
     let exc = parsedObj.exclusions;
     if (typeof exc === 'string') {
       try { exc = JSON.parse(exc); } catch(e) {}
     }
-    const excStr = Array.isArray(exc) ? exc.map(e => e.replace(/_/g, ' ')).join(', ') : exc.toString().replace(/_/g, ' ');
-    bullets.push(`<strong>Exclusions:</strong> ${excStr}`);
+    
+    const isNotEmpty = Array.isArray(exc) ? exc.length > 0 : (exc && exc.toString().trim() !== '' && exc.toString().toLowerCase() !== 'none');
+    
+    if (isNotEmpty) {
+      const excStr = Array.isArray(exc) ? exc.map(e => e.replace(/_/g, ' ')).join(', ') : exc.toString().replace(/_/g, ' ');
+      bullets.push(`<strong>Exclusions:</strong> ${excStr}`);
+    }
   }
 
   if (parsedObj.gender && parsedObj.gender.toLowerCase() !== 'any') {
@@ -359,7 +372,6 @@ function formatEligibility(data) {
   return `<ul class="list-disc list-inside space-y-1 text-slate-700 text-[11px]">${bullets.map(b => `<li>${b}</li>`).join('')}</ul>`;
 }
 
-// Formats document fields cleanly into bullet points
 function formatDocumentsList(data) {
   if (!data) return '<ul class="list-disc list-inside text-slate-600 text-[11px]"><li>Check official portal for specific required documents.</li></ul>';
 
