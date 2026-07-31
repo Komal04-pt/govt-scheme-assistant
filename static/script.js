@@ -290,7 +290,7 @@ function selectStatePortal(stateCode) {
   });
 }
 
-// Helper function to extract text cleanly from strings, arrays, or objects
+// Extract content cleanly without [object Object]
 function formatFieldContent(data) {
   if (!data) return null;
   if (typeof data === 'string') return data.trim();
@@ -318,15 +318,12 @@ function openModal(schemeId) {
   const desc = scheme.description || scheme.desc || "";
   const benefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
   
-  // Format Eligibility
   const rawEligibility = scheme.eligibility_desc || scheme.eligibility_criteria || scheme.eligibility?.criteria || scheme.eligibility;
   const eligibility = formatFieldContent(rawEligibility) || "Eligible citizens based on state/central guidelines.";
 
-  // Format Required Documents cleanly without [object Object]
   const rawDocs = scheme.documents_required || scheme.documents || scheme.required_documents || scheme.docs;
   const docsList = formatFieldContent(rawDocs) || "Check official portal for specific required documents.";
 
-  // Format How to Apply
   const rawApply = scheme.how_to_apply || scheme.application_process || scheme.apply_process;
   const applySteps = formatFieldContent(rawApply) || "Visit official portal or nearest Jan Seva Kendra.";
 
@@ -504,8 +501,22 @@ async function toggleRecording() {
 
   if (!isRecording) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      let options = MediaRecorder.isTypeSupported('audio/webm') ? { mimeType: 'audio/webm' } : {};
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        } 
+      });
+
+      let options = {};
+      if (typeof MediaRecorder !== 'undefined') {
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+          options = { mimeType: 'audio/webm;codecs=opus' };
+        } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+          options = { mimeType: 'audio/mp4' };
+        }
+      }
 
       mediaRecorder = new MediaRecorder(stream, options);
       audioChunks = [];
@@ -515,17 +526,18 @@ async function toggleRecording() {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunks, { type: mimeType });
         stream.getTracks().forEach(track => track.stop());
 
-        if (audioBlob.size > 1500) {
+        if (audioBlob.size > 300) {
           sendVoiceMessage(audioBlob);
         } else {
-          addMessage('Recording was too short. Please try again.', 'bot');
+          addMessage('Voice input was too short. Please speak again.', 'bot');
         }
       };
 
-      mediaRecorder.start(250);
+      mediaRecorder.start(100);
       isRecording = true;
 
       if (micBtn) {
@@ -533,7 +545,7 @@ async function toggleRecording() {
         micBtn.innerText = "⏹️";
       }
     } catch (err) {
-      alert('Microphone access denied.');
+      alert('Microphone access denied or not supported on this device.');
     }
   } else {
     if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
