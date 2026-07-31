@@ -1,6 +1,7 @@
 import json
 import os
 import uuid
+import logging
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -12,6 +13,10 @@ from pydantic import BaseModel
 
 from agent import run_agent
 from voice import transcribe_audio, synthesize_speech
+
+# Set up logging to track server errors in Render logs
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="JanSeva AI Assistant")
 
@@ -180,6 +185,7 @@ async def check_eligibility_api(request: Request):
         return JSONResponse({'success': True, 'matched_schemes': matched_schemes})
 
     except Exception as e:
+        logger.error(f"Eligibility error: {e}")
         return JSONResponse({'success': False, 'error': str(e)}, status_code=500)
 
 @app.get("/schemes.json")
@@ -189,54 +195,83 @@ def get_schemes_json():
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
-    session_id = req.session_id or str(uuid.uuid4())
-    result = _run_turn(session_id, req.message)
+    try:
+        session_id = req.session_id or str(uuid.uuid4())
+        result = _run_turn(session_id, req.message)
 
-    matched = result.get("matched", {})
-    eligible_names, possibly_names = _extract_scheme_names(matched)
+        matched = result.get("matched", {})
+        eligible_names, possibly_names = _extract_scheme_names(matched)
 
-    return ChatResponse(
-        session_id=session_id,
-        reply=result.get("reply", ""),
-        profile=result.get("profile", {}),
-        eligible_schemes=eligible_names,
-        possibly_eligible_schemes=possibly_names,
-    )
+        return ChatResponse(
+            session_id=session_id,
+            reply=result.get("reply", ""),
+            profile=result.get("profile", {}),
+            eligible_schemes=eligible_names,
+            possibly_eligible_schemes=possibly_names,
+        )
+    except Exception as e:
+        logger.error(f"Chat execution error: {e}")
+        return JSONResponse({'error': f"Chat processing failed: {str(e)}"}, status_code=500)
 
 @app.post("/voice-chat", response_model=VoiceChatResponse)
 async def voice_chat(session_id: str = Form(default=""), audio: UploadFile = File(...)):
-    session_id = session_id or str(uuid.uuid4())
-    audio_bytes = await audio.read()
+    try:
+        session_id = session_id or str(uuid.uuid4())
+        audio_bytes = await audio.read()
 
-    stt_result = transcribe_audio(audio_bytes, filename=audio.filename or "input.webm")
-    transcript = stt_result.get("text", "")
+        if not audio_bytes:
+            return JSONResponse({'error': 'Empty audio payload'}, status_code=400)
 
-    if not transcript.strip():
-        transcript = "Aapki aawaz saaf nahi aayi, kripya dubara boliye."
+        # 1. Speech to Text Transcription
+        try:
+            stt_result = transcribe_audio(audio_bytes, filename=audio.filename or "input.webm")
+            if isinstance(stt_result, dict):
+                transcript = stt_result.get("text", "")
+                language = stt_result.get("language", "english")
+            else:
+                transcript = str(stt_result)
+                language = "english"
+        except Exception as stt_err:
+            logger.error(f"STT Error: {stt_err}")
+            transcript = ""
+            language = "english"
 
-    if session_id not in SESSIONS:
-        SESSIONS[session_id] = {
-            "messages": [],
-            "profile": {},
-            "language": stt_result.get("language", "english")
-        }
+        if not transcript or not transcript.strip():
+            transcript = "Aapki aawaz saaf nahi aayi, kripya dubara boliye."
 
-    result = _run_turn(session_id, transcript)
+        if session_id not in SESSIONS:
+            SESSIONS[session_id] = {
+                "messages": [],
+                "profile": {},
+                "language": language
+            }
 
-    audio_url = synthesize_speech(result.get("reply", ""), language=result.get("language", "english"))
+        # 2. Agent Execution
+        result = _run_turn(session_id, transcript)
 
-    matched = result.get("matched", {})
-    eligible_names, possibly_names = _extract_scheme_names(matched)
+        # 3. Text to Speech Synthesis
+        audio_url = ""
+        try:
+            audio_url = synthesize_speech(result.get("reply", ""), language=result.get("language", "english")) or ""
+        except Exception as tts_err:
+            logger.error(f"TTS Error: {tts_err}")
+            audio_url = ""
 
-    return VoiceChatResponse(
-        session_id=session_id,
-        transcript=transcript,
-        reply=result.get("reply", ""),
-        audio_url=audio_url,
-        profile=result.get("profile", {}),
-        eligible_schemes=eligible_names,
-        possibly_eligible_schemes=possibly_names,
-    )
+        matched = result.get("matched", {})
+        eligible_names, possibly_names = _extract_scheme_names(matched)
+
+        return VoiceChatResponse(
+            session_id=session_id,
+            transcript=transcript,
+            reply=result.get("reply", "Mein aapki kaise madad kar sakta hoon?"),
+            audio_url=audio_url,
+            profile=result.get("profile", {}),
+            eligible_schemes=eligible_names,
+            possibly_eligible_schemes=possibly_names,
+        )
+    except Exception as e:
+        logger.error(f"Fatal Voice Endpoint Error: {e}")
+        return JSONResponse({'error': f"Voice error: {str(e)}"}, status_code=500)
 
 @app.get("/")
 def root():

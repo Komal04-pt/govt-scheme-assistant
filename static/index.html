@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="/static/style.css?v=11.0">
+  <link rel="stylesheet" href="/static/style.css?v=11.1">
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col font-sans">
 
@@ -226,9 +226,13 @@
         <div id="quickReplies" class="px-3 py-2 flex flex-wrap gap-1.5 bg-white border-t border-slate-100 shrink-0"></div>
         
         <div class="p-3 border-t border-slate-200 bg-white rounded-b-2xl flex items-center space-x-2 shrink-0">
-          <button id="micBtn" onclick="toggleRecording()" title="Voice Input" class="w-10 h-10 rounded-full border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 flex items-center justify-center text-sm transition shrink-0">🎤</button>
-          <input type="text" id="messageInput" placeholder="Type message..." class="flex-grow min-w-0 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-emerald-600 transition">
-          <button id="sendBtn" onclick="sendMessage()" class="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center text-xs sm:text-sm hover:bg-emerald-800 transition shrink-0">➤</button>
+          <button id="micBtn" onclick="toggleRecording()" title="Voice Input" class="w-10 h-10 rounded-full border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 flex items-center justify-center text-sm transition shrink-0">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <input type="text" id="messageInput" placeholder="Type message..." onkeypress="if(event.key === 'Enter') sendMessage()" class="flex-grow min-w-0 border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm focus:outline-none focus:border-emerald-600 transition">
+          <button id="sendBtn" onclick="sendMessage()" class="w-10 h-10 rounded-xl bg-emerald-700 text-white flex items-center justify-center text-xs sm:text-sm hover:bg-emerald-800 transition shrink-0">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
         </div>
       </div>
     </section>
@@ -324,6 +328,6 @@
   </div>
 
   <!-- External Script -->
-  <script src="/static/script.js?v=11.0" defer></script>
+  <script src="/static/script.js?v=11.1" defer></script>
 </body>
 </html>
