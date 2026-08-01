@@ -4,7 +4,7 @@
 
 JanSeva AI helps users cut through the complexity of India's government scheme landscape. Instead of manually searching dozens of scheme pages to figure out what applies to them, users describe themselves once — through text or voice — and get back a filtered, personalized list of schemes they're actually eligible for, along with a direct link to the official government portal to apply.
 
-🔗 **Live Demo:** [https://janseva-ai-assistant.onrender.com']
+🔗 **Live Demo:** [janseva-ai-assistant.onrender.com](https://janseva-ai-assistant.onrender.com)
 
 ---
 
