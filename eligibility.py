@@ -11,6 +11,7 @@ which could cause real harm to a user relying on this info.
 
 import json
 import os
+import re
 
 SCHEMES_PATH = os.path.join(os.path.dirname(__file__), "schemes.json")
 
@@ -23,10 +24,51 @@ except Exception as e:
     print(f"Warning: Failed to load schemes.json: {e}")
 
 
+def _to_number(value):
+    """
+    Safely convert a value (which may come from the LLM as int, float,
+    or a loosely-formatted string like '3 lakh' or '3,00,000') into a
+    plain number. Returns None if it can't be confidently parsed —
+    this keeps the eligibility check treating it as 'unknown' rather
+    than crashing the whole request with a TypeError.
+    """
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return value
+
+    if isinstance(value, str):
+        s = value.lower().strip()
+        s = s.replace(",", "")
+
+        if not s:
+            return None
+
+        # Handle "X lakh" / "X lac" phrasing (common in Indian English)
+        lakh_match = re.match(r"^([\d.]+)\s*(lakh|lac)s?$", s)
+        if lakh_match:
+            return float(lakh_match.group(1)) * 100000
+
+        # Handle "X crore"
+        crore_match = re.match(r"^([\d.]+)\s*crores?$", s)
+        if crore_match:
+            return float(crore_match.group(1)) * 10000000
+
+        # Strip any remaining non-numeric characters (e.g. "₹300000", "300000 rupees", "22 years")
+        cleaned = re.sub(r"[^\d.]", "", s)
+        if cleaned:
+            try:
+                return float(cleaned)
+            except ValueError:
+                return None
+
+    return None
+
+
 def _matches_occupation(scheme_occ, user_occ):
     if not scheme_occ:
         return True
-    
+
     # Normalize scheme occupations to lower-case list
     if isinstance(scheme_occ, str):
         scheme_occ = [scheme_occ.lower()]
@@ -35,24 +77,26 @@ def _matches_occupation(scheme_occ, user_occ):
 
     if "any" in scheme_occ or "all" in scheme_occ:
         return True
-    
+
     if user_occ is None:
         return None  # unknown, can't confirm
-        
+
     return str(user_occ).lower().strip() in scheme_occ
 
 
 def _matches_income(income_max, user_income):
     if income_max is None:
         return True
+    user_income = _to_number(user_income)
     if user_income is None:
-        return None  # unknown
+        return None  # unknown or unparseable — treat safely as unknown
     return user_income <= income_max
 
 
 def _matches_age(age_min, age_max, user_age):
     if age_min is None and age_max is None:
         return True
+    user_age = _to_number(user_age)
     if user_age is None:
         return None
     if age_min is not None and user_age < age_min:
@@ -65,14 +109,14 @@ def _matches_age(age_min, age_max, user_age):
 def _matches_gender(scheme_gender, user_gender):
     if not scheme_gender:
         return True
-    
+
     scheme_gender = str(scheme_gender).lower().strip()
     if scheme_gender in ["any", "all"]:
         return True
 
     if user_gender is None:
         return None
-        
+
     user_gender = str(user_gender).lower().strip()
     return scheme_gender == user_gender
 
@@ -80,14 +124,14 @@ def _matches_gender(scheme_gender, user_gender):
 def _matches_location(scheme_location, user_location):
     if not scheme_location:
         return True
-        
+
     scheme_location = str(scheme_location).lower().strip()
     if scheme_location in ["any", "all", "central"]:
         return True
 
     if user_location is None:
         return None
-        
+
     user_location = str(user_location).lower().strip()
     return scheme_location == user_location
 
@@ -96,7 +140,7 @@ def _matches_exclusions(exclusions, user_flags):
     """user_flags is a list of flags like ['income_tax_payer'] the user has."""
     if not exclusions or not user_flags:
         return True
-    
+
     user_flags_norm = [str(f).lower().strip() for f in user_flags]
     for ex in exclusions:
         if str(ex).lower().strip() in user_flags_norm:
@@ -110,6 +154,13 @@ def check_eligibility(scheme, profile):
                      missing_fields: [...], scheme_id: ...}
     "possibly_eligible" = some required fields unknown, need more info.
     """
+    # Defensive normalization: LLM-extracted numeric fields sometimes
+    # arrive as strings (e.g. "3 lakh", "22 years"). Coerce them once,
+    # up front, so every check below can safely assume a number or None.
+    profile = dict(profile)
+    profile["annual_income"] = _to_number(profile.get("annual_income"))
+    profile["age"] = _to_number(profile.get("age"))
+
     elig = scheme.get("eligibility", {})
     checks = []
     missing = []

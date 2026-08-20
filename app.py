@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from agent import run_agent
 from voice import transcribe_audio, synthesize_speech
+from eligibility import match_all_schemes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -70,6 +71,14 @@ class VoiceChatResponse(BaseModel):
     eligible_schemes: list
     possibly_eligible_schemes: list
 
+class EligibilityCheckRequest(BaseModel):
+    age: str | int | None = None
+    gender: str | None = None
+    state: str = "ALL"
+    occupation: str | None = None
+    income: str | int | None = None
+
+
 def _run_turn(session_id: str, user_message: str):
     session = SESSIONS.get(session_id, {"messages": [], "profile": {}, "language": "english"})
     session["messages"].append({"role": "user", "content": user_message})
@@ -123,70 +132,62 @@ async def get_filtered_schemes(state: str = "ALL"):
     for s in all_schemes:
         elig = s.get('eligibility', {})
         loc = str(elig.get('location', s.get('state', 'CENTRAL'))).lower()
-        
+
         if loc in ['central', 'all', 'all india'] or loc == target_code.lower() or loc == target_lower:
             filtered.append(s)
 
     return JSONResponse(filtered)
 
+
 @app.post("/api/check-eligibility")
 async def check_eligibility_api(request: Request):
+    """
+    NOTE: This route previously re-implemented its own eligibility filtering
+    loop, separate from eligibility.py's rule engine. That meant this API
+    and the conversational /chat agent could silently disagree on the same
+    user's eligibility if the rules ever diverged. It now reuses
+    match_all_schemes() from eligibility.py, so there's a single source of
+    truth for eligibility logic across the whole app.
+
+    It also previously crashed with int(data.get('age', 0)) if age/income
+    arrived as a non-numeric string (e.g. "22 years", "3 lakh") — the same
+    class of bug found earlier in eligibility.py. match_all_schemes()
+    already normalizes numeric fields safely via _to_number(), so that
+    risk is gone here too.
+    """
     try:
         data = await request.json() or {}
-        
-        user_age = int(data.get('age', 0))
-        user_gender = str(data.get('gender', 'any')).lower()
+
         user_state_raw = str(data.get('state', 'ALL')).upper()
-        user_state = STATE_MAP.get(user_state_raw, user_state_raw.lower())
-        user_occupation = str(data.get('occupation', 'any')).lower()
-        user_income = int(data.get('income', 9999999))
+        # "ALL" means the user didn't specify a state. Previously this
+        # skipped location filtering entirely, which meant a state-specific
+        # scheme (e.g. an MP-only scheme) could incorrectly show up for a
+        # user in a completely different state. Passing location=None here
+        # lets the tri-state rule engine correctly mark such schemes as
+        # "possibly_eligible" (unknown) instead of wrongly "eligible" —
+        # consistent with this project's core design goal of never
+        # asserting eligibility the code can't actually confirm.
+        user_location = None if user_state_raw == "ALL" else STATE_MAP.get(user_state_raw, user_state_raw.lower())
 
-        json_path = os.path.join(os.path.dirname(__file__), "schemes.json")
-        if not os.path.exists(json_path):
-            return JSONResponse({'success': False, 'error': 'schemes.json file not found'}, status_code=404)
+        profile = {
+            "age": data.get("age"),
+            "gender": data.get("gender"),
+            "location": user_location,
+            "occupation": data.get("occupation"),
+            "annual_income": data.get("income"),
+        }
 
-        with open(json_path, 'r', encoding='utf-8') as f:
-            all_schemes = json.load(f)
+        result = match_all_schemes(profile)
 
-        matched_schemes = []
-        for scheme in all_schemes:
-            elig = scheme.get('eligibility', {})
-
-            min_age = elig.get('age_min', 0)
-            max_age = elig.get('age_max', 100)
-            if not (min_age <= user_age <= max_age):
-                continue
-
-            scheme_gender = elig.get('gender', 'any')
-            if isinstance(scheme_gender, str):
-                scheme_gender = scheme_gender.lower()
-                if scheme_gender not in ['any', 'all'] and user_gender != scheme_gender:
-                    continue
-
-            scheme_loc = str(elig.get('location', scheme.get('state', 'CENTRAL'))).lower()
-            if scheme_loc not in ['central', 'all', 'all india'] and user_state_raw != 'ALL' and scheme_loc != user_state and scheme_loc != user_state_raw.lower():
-                continue
-
-            allowed_occ = elig.get('occupation', ['any'])
-            if isinstance(allowed_occ, str):
-                allowed_occ = [allowed_occ.lower()]
-            elif isinstance(allowed_occ, list):
-                allowed_occ = [str(o).lower() for o in allowed_occ]
-
-            if 'any' not in allowed_occ and user_occupation not in allowed_occ:
-                continue
-
-            max_inc = elig.get('income_max')
-            if max_inc is not None and user_income > max_inc:
-                continue
-
-            matched_schemes.append(scheme)
-
-        return JSONResponse({'success': True, 'matched_schemes': matched_schemes})
+        return JSONResponse({
+            'success': True,
+            'matched_schemes': result.get("eligible", []),
+        })
 
     except Exception as e:
         logger.error(f"Eligibility error: {e}")
         return JSONResponse({'success': False, 'error': str(e)}, status_code=500)
+
 
 @app.get("/schemes.json")
 def get_schemes_json():
