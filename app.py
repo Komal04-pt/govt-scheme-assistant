@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 from agent import run_agent
 from voice import transcribe_audio, synthesize_speech
-from eligibility import match_all_schemes
+from eligibility import match_all_schemes, SCHEMES
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -115,12 +115,7 @@ def _extract_scheme_names(matched_data):
 
 @app.get("/api/schemes")
 async def get_filtered_schemes(state: str = "ALL"):
-    json_path = os.path.join(os.path.dirname(__file__), "schemes.json")
-    if not os.path.exists(json_path):
-        return JSONResponse([], status_code=200)
-
-    with open(json_path, 'r', encoding='utf-8') as f:
-        all_schemes = json.load(f)
+    all_schemes = SCHEMES
 
     if state.upper() == "ALL":
         return JSONResponse(all_schemes)
@@ -141,32 +136,10 @@ async def get_filtered_schemes(state: str = "ALL"):
 
 @app.post("/api/check-eligibility")
 async def check_eligibility_api(request: Request):
-    """
-    NOTE: This route previously re-implemented its own eligibility filtering
-    loop, separate from eligibility.py's rule engine. That meant this API
-    and the conversational /chat agent could silently disagree on the same
-    user's eligibility if the rules ever diverged. It now reuses
-    match_all_schemes() from eligibility.py, so there's a single source of
-    truth for eligibility logic across the whole app.
-
-    It also previously crashed with int(data.get('age', 0)) if age/income
-    arrived as a non-numeric string (e.g. "22 years", "3 lakh") — the same
-    class of bug found earlier in eligibility.py. match_all_schemes()
-    already normalizes numeric fields safely via _to_number(), so that
-    risk is gone here too.
-    """
     try:
         data = await request.json() or {}
 
         user_state_raw = str(data.get('state', 'ALL')).upper()
-        # "ALL" means the user didn't specify a state. Previously this
-        # skipped location filtering entirely, which meant a state-specific
-        # scheme (e.g. an MP-only scheme) could incorrectly show up for a
-        # user in a completely different state. Passing location=None here
-        # lets the tri-state rule engine correctly mark such schemes as
-        # "possibly_eligible" (unknown) instead of wrongly "eligible" —
-        # consistent with this project's core design goal of never
-        # asserting eligibility the code can't actually confirm.
         user_location = None if user_state_raw == "ALL" else STATE_MAP.get(user_state_raw, user_state_raw.lower())
 
         profile = {
@@ -191,8 +164,7 @@ async def check_eligibility_api(request: Request):
 
 @app.get("/schemes.json")
 def get_schemes_json():
-    json_path = os.path.join(os.path.dirname(__file__), "schemes.json")
-    return FileResponse(json_path)
+    return JSONResponse(SCHEMES)
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):

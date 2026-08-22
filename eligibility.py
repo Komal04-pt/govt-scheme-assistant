@@ -1,37 +1,27 @@
-"""
-Rule-based eligibility engine.
-
-IMPORTANT DESIGN DECISION:
-Eligibility is decided by deterministic Python logic here, NOT by the LLM.
-The LLM is only used to (1) extract structured profile info from natural
-conversation, and (2) explain the results in natural language.
-This avoids the LLM hallucinating eligibility for a government scheme,
-which could cause real harm to a user relying on this info.
-"""
-
 import json
 import os
 import re
+from pymongo import MongoClient
+from dotenv import load_dotenv
 
-SCHEMES_PATH = os.path.join(os.path.dirname(__file__), "schemes.json")
+load_dotenv()
 
-# Safe file loading mechanism
+MONGODB_URI = os.environ.get("MONGODB_URI")
+DB_NAME = "janseva_db"
+COLLECTION_NAME = "schemes"
+
 try:
-    with open(SCHEMES_PATH, "r", encoding="utf-8") as f:
-        SCHEMES = json.load(f)
+    _client = MongoClient(MONGODB_URI)
+    _db = _client[DB_NAME]
+    SCHEMES = list(_db[COLLECTION_NAME].find({}, {"_id": 0}))
+    if not SCHEMES:
+        print("Warning: No schemes found in MongoDB — check migration ran successfully.")
 except Exception as e:
     SCHEMES = []
-    print(f"Warning: Failed to load schemes.json: {e}")
+    print(f"Warning: Failed to load schemes from MongoDB: {e}")
 
 
 def _to_number(value):
-    """
-    Safely convert a value (which may come from the LLM as int, float,
-    or a loosely-formatted string like '3 lakh' or '3,00,000') into a
-    plain number. Returns None if it can't be confidently parsed —
-    this keeps the eligibility check treating it as 'unknown' rather
-    than crashing the whole request with a TypeError.
-    """
     if value is None:
         return None
     if isinstance(value, (int, float)):
@@ -44,17 +34,14 @@ def _to_number(value):
         if not s:
             return None
 
-        # Handle "X lakh" / "X lac" phrasing (common in Indian English)
         lakh_match = re.match(r"^([\d.]+)\s*(lakh|lac)s?$", s)
         if lakh_match:
             return float(lakh_match.group(1)) * 100000
 
-        # Handle "X crore"
         crore_match = re.match(r"^([\d.]+)\s*crores?$", s)
         if crore_match:
             return float(crore_match.group(1)) * 10000000
 
-        # Strip any remaining non-numeric characters (e.g. "₹300000", "300000 rupees", "22 years")
         cleaned = re.sub(r"[^\d.]", "", s)
         if cleaned:
             try:
@@ -69,7 +56,6 @@ def _matches_occupation(scheme_occ, user_occ):
     if not scheme_occ:
         return True
 
-    # Normalize scheme occupations to lower-case list
     if isinstance(scheme_occ, str):
         scheme_occ = [scheme_occ.lower()]
     else:
@@ -79,7 +65,7 @@ def _matches_occupation(scheme_occ, user_occ):
         return True
 
     if user_occ is None:
-        return None  # unknown, can't confirm
+        return None
 
     return str(user_occ).lower().strip() in scheme_occ
 
@@ -89,7 +75,7 @@ def _matches_income(income_max, user_income):
         return True
     user_income = _to_number(user_income)
     if user_income is None:
-        return None  # unknown or unparseable — treat safely as unknown
+        return None
     return user_income <= income_max
 
 
@@ -137,7 +123,6 @@ def _matches_location(scheme_location, user_location):
 
 
 def _matches_exclusions(exclusions, user_flags):
-    """user_flags is a list of flags like ['income_tax_payer'] the user has."""
     if not exclusions or not user_flags:
         return True
 
@@ -149,14 +134,6 @@ def _matches_exclusions(exclusions, user_flags):
 
 
 def check_eligibility(scheme, profile):
-    """
-    Returns a dict: {status: "eligible" | "not_eligible" | "possibly_eligible",
-                     missing_fields: [...], scheme_id: ...}
-    "possibly_eligible" = some required fields unknown, need more info.
-    """
-    # Defensive normalization: LLM-extracted numeric fields sometimes
-    # arrive as strings (e.g. "3 lakh", "22 years"). Coerce them once,
-    # up front, so every check below can safely assume a number or None.
     profile = dict(profile)
     profile["annual_income"] = _to_number(profile.get("annual_income"))
     profile["age"] = _to_number(profile.get("age"))
@@ -214,7 +191,6 @@ def check_eligibility(scheme, profile):
 
 
 def match_all_schemes(profile):
-    """Run eligibility check across all schemes, return categorized results."""
     eligible = []
     possibly_eligible = []
 
@@ -231,5 +207,18 @@ def match_all_schemes(profile):
 def get_scheme_by_id(scheme_id):
     for s in SCHEMES:
         if s.get("id") == scheme_id:
+            return s
+    return None
+
+def search_scheme_by_name(query_name):
+    if not query_name:
+        return None
+    query_lower = query_name.lower().strip()
+    for s in SCHEMES:
+        scheme_name = str(s.get("name", "")).lower()
+        scheme_name_hi = str(s.get("name_hi", "")).lower()
+        if query_lower in scheme_name or scheme_name in query_lower:
+            return s
+        if scheme_name_hi and (query_lower in scheme_name_hi or scheme_name_hi in query_lower):
             return s
     return None

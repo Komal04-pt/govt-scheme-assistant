@@ -66,7 +66,7 @@ function toggleBookmark(event, schemeId) {
   }
 
   localStorage.setItem('janseva_bookmarks', JSON.stringify(bookmarks));
-  
+
   if (activeTab === 'schemes') renderCatalog();
   if (activeTab === 'states') selectStatePortal(currentGlobalState === 'ALL' ? 'BR' : currentGlobalState);
 }
@@ -109,7 +109,7 @@ function switchTab(tabId) {
 
   const activePage = document.getElementById(`page-${tabId}`);
   const activeNav = document.getElementById(`tab-${tabId}`);
-  
+
   if (activePage) activePage.classList.add('active-page');
   if (activeNav) activeNav.classList.add('active');
 
@@ -120,7 +120,12 @@ function switchTab(tabId) {
 function onGlobalStateChange() {
   const stateSelect = document.getElementById('globalStateSelect');
   if (stateSelect) currentGlobalState = stateSelect.value;
-  renderCatalog();
+
+  if (activeTab === 'states') {
+    selectStatePortal(currentGlobalState === 'ALL' ? 'BR' : currentGlobalState);
+  } else {
+    renderCatalog();
+  }
 }
 
 function isSchemeMatchState(scheme, targetStateCode) {
@@ -149,7 +154,7 @@ function buildSchemeCardHtml(scheme, styleVariant, searchVal = '') {
   const schemeDesc = scheme.description || scheme.desc || "";
   const schemeBenefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
   const schemeState = isCentral ? 'CENTRAL' : (STATE_NAMES[rawLoc] || rawLoc);
-  
+
   const bookmarked = isBookmarked(scheme.id);
 
   const highlightedTitle = highlightText(schemeTitle, searchVal);
@@ -189,7 +194,7 @@ function renderCatalog() {
     }
 
     const matchState = isSchemeMatchState(s, currentGlobalState);
-    
+
     let matchCat = (currentCatalogCat === 'ALL');
     if (!matchCat) {
       if (currentCatalogCat === 'Youth' && (s.category === 'Youth' || s.category === 'Education')) matchCat = true;
@@ -200,16 +205,16 @@ function renderCatalog() {
     const sTitle = s.name || s.title || '';
     const sDesc = s.description || s.desc || '';
     const sBenefit = s.benefits || s.benefit || '';
-    const matchSearch = !searchVal || 
-      sTitle.toLowerCase().includes(searchVal) || 
-      sDesc.toLowerCase().includes(searchVal) || 
+    const matchSearch = !searchVal ||
+      sTitle.toLowerCase().includes(searchVal) ||
+      sDesc.toLowerCase().includes(searchVal) ||
       sBenefit.toLowerCase().includes(searchVal);
-    
+
     return matchState && matchCat && matchSearch;
   });
 
   if (filtered.length === 0) {
-    const emptyMsg = currentCatalogCat === 'Saved' 
+    const emptyMsg = currentCatalogCat === 'Saved'
       ? 'Aapne abhi tak koi scheme bookmark nahi ki hai. ☆ Save button par click karke save karein!'
       : 'No schemes found matching criteria.';
     container.innerHTML = `<p class="col-span-3 text-center text-xs text-slate-400 py-10">${emptyMsg}</p>`;
@@ -248,7 +253,7 @@ function onSearchChange() {
 function filterByCategory(cat) {
   currentCatalogCat = cat;
   switchTab('schemes');
-  
+
   const buttons = document.querySelectorAll('.cat-filter-btn, .category-btn');
   buttons.forEach(btn => {
     if (btn.innerText.toLowerCase().includes(cat.toLowerCase())) {
@@ -307,7 +312,7 @@ function selectStatePortal(stateCode) {
 
 function formatEligibility(data) {
   if (!data) return '<p class="text-slate-500 text-[11px]">Eligible citizens meeting state/central guidelines.</p>';
-  
+
   let parsedObj = {};
 
   if (typeof data === 'object' && !Array.isArray(data)) {
@@ -358,9 +363,9 @@ function formatEligibility(data) {
     if (typeof exc === 'string') {
       try { exc = JSON.parse(exc); } catch(e) {}
     }
-    
+
     const isNotEmpty = Array.isArray(exc) ? exc.length > 0 : (exc && exc.toString().trim() !== '' && exc.toString().toLowerCase() !== 'none');
-    
+
     if (isNotEmpty) {
       const excStr = Array.isArray(exc) ? exc.map(e => e.replace(/_/g, ' ')).join(', ') : exc.toString().replace(/_/g, ' ');
       bullets.push(`<strong>Exclusions:</strong> ${excStr}`);
@@ -393,7 +398,7 @@ function formatDocumentsList(data) {
   }
 
   const cleanList = list.map(item => String(item).trim()).filter(Boolean);
-  
+
   if (cleanList.length === 0) {
     return '<ul class="list-disc list-inside text-slate-600 text-[11px]"><li>Check official portal for specific required documents.</li></ul>';
   }
@@ -413,7 +418,7 @@ function openModal(schemeId) {
   const title = scheme.name || scheme.title || "Government Scheme";
   const desc = scheme.description || scheme.desc || "";
   const benefit = scheme.benefits || scheme.benefit || "Financial / Welfare Benefit";
-  
+
   const rawEligibility = scheme.eligibility_desc || scheme.eligibility_criteria || scheme.eligibility?.criteria || scheme.eligibility;
   const eligibilityHtml = formatEligibility(rawEligibility);
 
@@ -427,7 +432,7 @@ function openModal(schemeId) {
     modalContent.innerHTML = `
       <div class="flex justify-between items-center pr-6 mb-2">
         <span class="text-[10px] font-bold uppercase text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-md">${scheme.category || 'General'}</span>
-        
+
         <button onclick="toggleBookmark(event, '${scheme.id}'); openModal('${scheme.id}');" class="text-xs font-semibold px-2.5 py-1 rounded-md transition ${bookmarked ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">
           ${bookmarked ? '★ Saved' : '☆ Save Scheme'}
         </button>
@@ -435,7 +440,7 @@ function openModal(schemeId) {
 
       <h3 class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">${title}</h3>
       <p class="text-xs text-slate-600 mt-1 leading-relaxed">${desc}</p>
-      
+
       <div class="my-3 bg-emerald-50/90 border border-emerald-200 p-3 rounded-xl text-xs">
         <p class="font-bold text-emerald-800 flex items-center gap-1.5">
           <i class="fa-solid fa-gift text-emerald-600"></i> Key Benefit:
@@ -489,17 +494,17 @@ function closeEligibilityModal() {
 function resetEligibilityForm() {
   const form = document.getElementById('eligibilityForm');
   if (form) form.reset();
-  
+
   const resultsDiv = document.getElementById('eligibilityResults');
   if (resultsDiv) resultsDiv.classList.add('hidden');
-  
+
   const listDiv = document.getElementById('matchedSchemesList');
   if (listDiv) listDiv.innerHTML = '';
 }
 
 async function calculateEligibility(event) {
   event.preventDefault();
-  
+
   const age = document.getElementById('userAge') ? document.getElementById('userAge').value : 0;
   const gender = document.getElementById('userGender') ? document.getElementById('userGender').value : 'any';
   const state = document.getElementById('userState') ? document.getElementById('userState').value : 'ALL';
@@ -519,12 +524,12 @@ async function calculateEligibility(event) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ age, gender, state, occupation, income })
     });
-    
+
     const data = await response.json();
-    
+
     if (data.success && data.matched_schemes && data.matched_schemes.length > 0) {
       if (countHeader) countHeader.innerText = `${data.matched_schemes.length} Eligible Schemes Found`;
-      
+
       listDiv.innerHTML = data.matched_schemes.map(s => `
         <div onclick="closeEligibilityModal(); openModal('${s.id}')" class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:border-emerald-500 hover:bg-emerald-50/30 transition flex justify-between items-center">
           <div>
@@ -554,7 +559,6 @@ function askBotAbout(schemeName) {
 function addMessage(text, sender, isLoading = false, audioUrl = null) {
   if (!chatEl) return;
 
-  // Purani speech ko stop kar do naya message aane par
   stopSpeech();
 
   const wrapper = document.createElement('div');
@@ -573,7 +577,6 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
     div.textContent = text;
   }
 
-  // Audio Handler with Play/Stop Toggle Control
   if (sender === 'bot' && !isLoading) {
     const audioContainer = document.createElement('div');
     audioContainer.className = 'mt-3 pt-2 border-t border-slate-100 flex items-center gap-2';
@@ -588,7 +591,7 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
     } else {
       const speakBtn = document.createElement('button');
       speakBtn.className = 'text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 transition';
-      
+
       const setBtnState = (isPlaying) => {
         if (isPlaying) {
           speakBtn.innerHTML = '⏹️ Stop Listening';
@@ -600,9 +603,9 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
       };
 
       setBtnState(false);
-      
+
       const cleanText = div.innerText || div.textContent;
-      
+
       const toggleSpeech = () => {
         if (!('speechSynthesis' in window)) return;
 
@@ -613,7 +616,6 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
           stopSpeech();
           const utterance = new SpeechSynthesisUtterance(cleanText);
 
-          // Language script detection (Devanagari \u0900-\u097F)
           const isHindi = /[\u0900-\u097F]/.test(cleanText);
           utterance.lang = isHindi ? 'hi-IN' : 'en-IN';
 
@@ -634,7 +636,6 @@ function addMessage(text, sender, isLoading = false, audioUrl = null) {
       speakBtn.onclick = toggleSpeech;
       audioContainer.appendChild(speakBtn);
 
-      // Auto start speech playback
       toggleSpeech();
     }
 
@@ -657,12 +658,12 @@ async function toggleRecording() {
   if (!isRecording) {
     try {
       stopSpeech();
-      const stream = await navigator.mediaDevices.getUserMedia({ 
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true
-        } 
+        }
       });
 
       let options = {};
@@ -720,7 +721,7 @@ async function sendVoiceMessage(audioBlob) {
   const micBtn = document.getElementById('micBtn');
   if (sendBtn) sendBtn.disabled = true;
   if (micBtn) micBtn.disabled = true;
-  
+
   const loadingMsg = addMessage('Processing voice message...', 'bot', true);
 
   try {
@@ -730,7 +731,7 @@ async function sendVoiceMessage(audioBlob) {
     formData.append('session_id', sessionId || '');
 
     const res = await fetch('/voice-chat', { method: 'POST', body: formData });
-    
+
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
       throw new Error(errData.error || `Server Status ${res.status}`);
@@ -740,7 +741,7 @@ async function sendVoiceMessage(audioBlob) {
     sessionId = data.session_id;
 
     if (loadingMsg) loadingMsg.remove();
-    
+
     if (data.transcript && data.transcript.trim().length > 1) {
       addMessage(data.transcript, 'user');
       addMessage(data.reply, 'bot', false, data.audio_url);
