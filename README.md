@@ -1,66 +1,70 @@
 # 🏛️ JanSeva AI Assistant
 
-> **A Multilingual, Voice-Enabled GenAI Agent for Indian Government Scheme Discovery**
+> **A chatbot that helps people find Indian government welfare schemes they qualify for — by voice or text, in English or Hindi.**
 
-JanSeva AI helps users cut through the complexity of India's government scheme landscape. Instead of manually searching dozens of scheme pages to figure out what applies to them, users describe themselves once — through text or voice — and get back a filtered, personalized list of schemes they're actually eligible for, along with a direct link to the official government portal to apply.
+Finding the right government scheme in India is hard. There are 50+ schemes spread across different websites, each with its own list of rules about who can apply. Most people don't have time to read through all of them just to find out if they qualify.
+
+JanSeva AI fixes this. A user just talks about themselves — their age, income, job, and location — either by typing or speaking. The app then checks this against every scheme in its database and tells the user exactly which ones they qualify for, along with a link to apply on the official government website.
 
 🔗 **Live Demo:** [janseva-ai-assistant.onrender.com](https://janseva-ai-assistant.onrender.com)
 
 ---
 
-## 🎯 What This Solves
+## 🎯 What Problem Does It Solve
 
-Government scheme portals are large, fragmented, and hard to navigate — a user often doesn't know which of the 50+ schemes even apply to them without reading through pages of eligibility criteria one by one.
+Government scheme websites are confusing and scattered. A user usually has no way of knowing which schemes apply to them without manually reading through pages of rules, one scheme at a time.
 
-JanSeva AI doesn't replace the official application process — users still apply on the government's own portal. What it does is:
+JanSeva AI doesn't replace the actual application process — users still need to apply on the government's official site. What this app does is:
 
-- Take a user's basic profile (age, income, occupation, location, gender) through a natural conversation, in text or voice
-- Instantly filter it against a structured database of **50+ Indian government schemes**
-- Return only the schemes the user is actually eligible for (or *possibly* eligible for, if some info is missing)
-- Point them directly to the correct official page to apply — no more guessing or getting lost in unrelated scheme listings
+- Take basic details from the user (age, income, job, location, gender) through a normal conversation, typed or spoken
+- Compare this instantly against a database of **50+ government schemes**
+- Show only the schemes the user actually qualifies for (or *might* qualify for, if some info is still missing)
+- Give a direct link to the right page to apply
 
-This saves time for anyone overwhelmed by government websites, and gives them a clear, upfront understanding of exactly how many schemes they qualify for before they go apply.
+This saves people time and gives them a clear answer upfront, instead of leaving them to guess.
 
 ---
 
-## 🎙️ Key Design Principles
+## 🎙️ How It's Built (Key Ideas)
 
-- **Voice-First Accessibility:** Includes Speech-to-Text (STT) via **Groq Whisper** and Text-to-Speech (TTS) via **gTTS**, so users can interact by speaking instead of typing.
-- **Deterministic Eligibility Engine:** To prevent LLM hallucinations on critical government policy decisions, eligibility is decided by a strict, auditable Python rule engine (`eligibility.py`) against structured scheme data (`schemes.json`) — never by the LLM. The LLM is used only for understanding user input (NLU) and generating friendly, natural-language responses (NLG).
-- **Multilingual by Design:** Supports English, Hindi (Devanagari script), and Hinglish (Hindi written in Roman script), auto-detected from the user's own message.
-- **Ultra-Low Latency:** Uses Groq's LPU infrastructure for both the LLM (Llama 3.3 70B) and Whisper large-v3, enabling near-instant conversational responses.
+- **You can talk to it:** Speech-to-Text (via **Groq Whisper**) turns your voice into text, and Text-to-Speech (via **gTTS**) reads replies back to you.
+- **The AI doesn't decide eligibility on its own:** To prevent LLM hallucinations on critical policy decisions, eligibility is decided by a separate, plain Python rule engine (eligibility.py) against structured scheme data — never by the LLM. The LLM is used only for understanding user input (NLU) and generating friendly, natural-language responses (NLG)
+- **One single place for all data:** All scheme details are stored in MongoDB. Both the chatbot and the website's scheme list read from this same place, so they never show different or outdated information.
+- **Works in 3 languages:** English, Hindi, and Hinglish — the app figures out which one you're using automatically.
+- **Fast responses:** Uses Groq's infrastructure to run the AI models quickly, so replies come back almost instantly.
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
+| Part of the App | What's Used |
 |---|---|
-| **Backend Framework** | FastAPI, Uvicorn, Pydantic |
-| **Agentic Orchestration** | LangGraph, LangChain |
-| **LLM Engine** | Groq API (`llama-3.3-70b-versatile`) |
-| **Voice Processing** | Groq Whisper (`whisper-large-v3`) for STT, gTTS for TTS |
-| **Logic & Data Engine** | Deterministic Python rule engine + JSON dataset (50+ schemes) |
-| **Frontend** | HTML5, CSS, Vanilla JavaScript (MediaRecorder API, Fetch API) |
-| **Deployment** | Render |
+| **Backend** | FastAPI, Uvicorn, Pydantic |
+| **Database** | MongoDB (accessed via PyMongo) — stores all scheme data |
+| **Connecting to the AI** | LangChain's `ChatGroq` — a simple way to call the Groq API |
+| **AI Model** | Groq API |
+| **Voice** | Groq Whisper (speech-to-text), gTTS (text-to-speech) |
+| **Eligibility Logic** | A custom Python rule-checker, no AI involved |
+| **Frontend** | HTML, CSS, plain JavaScript (no framework — uses the browser's built-in MediaRecorder and Fetch APIs) |
+| **Hosting** | Render |
 
 ---
 
-## 🧠 How It Works
+## 🧠 How It Works, Step by Step
 
-1. User sends a message (typed or spoken) through the web UI.
-2. If spoken, audio is transcribed to text using **Groq Whisper**.
-3. The text is passed into a **LangGraph** agent pipeline with four steps:
-   - **Extract Info** — an LLM call parses the conversation to extract a structured profile (age, income, occupation, location, gender) and detects the user's language.
-   - **Check Missing Fields** — if critical profile fields are missing, the agent asks a short follow-up question and pauses for the next reply.
-   - **Match Schemes** — once enough info is available, a deterministic Python rule engine (no LLM involved) checks the profile against every scheme's eligibility criteria.
-   - **Generate Response** — an LLM call turns the matched results into a clear, friendly response in the user's detected language, including how to apply and links to the official portal.
-4. If the interaction was voice-based, the reply is converted back to speech using **gTTS**.
-5. The response — text, matched schemes, and (if applicable) audio — is returned to the frontend.
+1. User sends a message — typed or spoken — through the website.
+2. If it's a voice message, **Groq Whisper** converts it to text first.
+3. The text goes through a simple step-by-step process in `agent.py`:
+   - **Understand the message** — the AI reads the conversation and pulls out details like age, income, job, and location. It also figures out what language the user is writing in, and what kind of message it is (a new question, a follow-up, a greeting, etc.).
+   - **Decide what to do next** — if too much info is still missing, the app asks a quick follow-up question. If the user is just saying "thanks" or "hi", it replies casually. Otherwise, it moves on to checking schemes.
+   - **Check eligibility** — a plain Python function (no AI) compares the user's details against every scheme's rules, using live data from MongoDB.
+   - **Write the reply** — the AI turns the matched schemes into a clear, friendly answer in the user's language, including how to apply.
+4. If the user spoke instead of typing, the reply is also converted to speech using **gTTS**.
+5. The final answer (text, matching schemes, and audio if needed) is sent back and shown on the screen.
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Files
 
 ```
 govt-scheme-assistant/
@@ -68,6 +72,7 @@ govt-scheme-assistant/
 ├── agent.py
 ├── eligibility.py
 ├── voice.py
+├── migrate_json_to_mongo.py
 ├── schemes.json
 ├── Procfile
 ├── requirements.txt
@@ -80,17 +85,18 @@ govt-scheme-assistant/
     └── style.css
 ```
 
+**About `schemes.json`:** this file is just used for editing. If a new scheme needs to be added or an existing one changed, it's edited here first, then pushed into MongoDB by running `migrate_json_to_mongo.py`. The live app always reads from MongoDB, never directly from this file.
+
 ---
 
 ## 🚀 Deployment
 
-This project is live, deployed on **Render**, using the included `Procfile` to define the start command (`uvicorn app:app --host 0.0.0.0 --port $PORT`).
+This app is live on **Render**. The `Procfile` tells Render how to start it (`uvicorn app:app --host 0.0.0.0 --port $PORT`).
 
 ---
 
-## 🔭 Future Improvements
+## 🔭 What Could Be Added Next
 
-- Move scheme data and session storage to a proper database for scalability
-- Add authentication and rate-limiting
-- Expand scheme coverage and add automated sync with official scheme sources
-- Guided, fully voice-driven flow for low-literacy users
+- Login/signup and rate-limiting
+- More schemes, and a way to auto-update from official government sources
+- A fully voice-guided mode for users who may not be comfortable reading

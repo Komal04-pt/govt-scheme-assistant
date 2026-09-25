@@ -1,7 +1,3 @@
-"""
-One-time script to migrate schemes.json into MongoDB.
-Run this once: python migrate_json_to_mongo.py
-"""
 import json
 import os
 from pymongo import MongoClient

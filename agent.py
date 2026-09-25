@@ -139,8 +139,7 @@ def extract_info(state: AgentState) -> AgentState:
 
 
 def route_after_extraction(state: AgentState) -> str:
-    """Plain-Python replacement for the LangGraph conditional edge.
-    Same exact decision logic as before, just called directly now."""
+  """Decides the next step based on message type and profile completeness."""
     message_type = state.get("message_type", "new_query")
 
     if state.get("named_scheme_query"):
@@ -331,15 +330,6 @@ Write your response to the user now:"""
 
 
 def run_agent(messages, profile=None, language="hinglish"):
-    """
-    Same public interface/return-shape as before (app.py calls this exact
-    function the exact same way), so app.py needs ZERO changes.
-
-    Internally this now runs the pipeline as plain sequential Python calls
-    instead of going through a LangGraph StateGraph. The decision logic
-    (route_after_extraction) is identical to what the graph's conditional
-    edge used to do.
-    """
     state: AgentState = {
         "messages": messages,
         "profile": profile or {},
