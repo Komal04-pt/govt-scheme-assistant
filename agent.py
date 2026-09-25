@@ -3,7 +3,6 @@ import json
 import re
 import logging
 from typing import TypedDict, List, Optional
-from langgraph.graph import StateGraph, END
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -140,6 +139,8 @@ def extract_info(state: AgentState) -> AgentState:
 
 
 def route_after_extraction(state: AgentState) -> str:
+    """Plain-Python replacement for the LangGraph conditional edge.
+    Same exact decision logic as before, just called directly now."""
     message_type = state.get("message_type", "new_query")
 
     if state.get("named_scheme_query"):
@@ -329,37 +330,17 @@ Write your response to the user now:"""
     return state
 
 
-def build_graph():
-    graph = StateGraph(AgentState)
-    graph.add_node("extract_info", extract_info)
-    graph.add_node("ask_followup", ask_followup)
-    graph.add_node("chit_chat_response", chit_chat_response)
-    graph.add_node("match_schemes", match_schemes_node)
-    graph.add_node("generate_response", generate_response)
-
-    graph.set_entry_point("extract_info")
-    graph.add_conditional_edges(
-        "extract_info",
-        route_after_extraction,
-        {
-            "ask_followup": "ask_followup",
-            "match_schemes": "match_schemes",
-            "chit_chat": "chit_chat_response",
-        },
-    )
-    graph.add_edge("ask_followup", END)
-    graph.add_edge("chit_chat_response", END)
-    graph.add_edge("match_schemes", "generate_response")
-    graph.add_edge("generate_response", END)
-
-    return graph.compile()
-
-
-agent_graph = build_graph()
-
-
 def run_agent(messages, profile=None, language="hinglish"):
-    initial_state: AgentState = {
+    """
+    Same public interface/return-shape as before (app.py calls this exact
+    function the exact same way), so app.py needs ZERO changes.
+
+    Internally this now runs the pipeline as plain sequential Python calls
+    instead of going through a LangGraph StateGraph. The decision logic
+    (route_after_extraction) is identical to what the graph's conditional
+    edge used to do.
+    """
+    state: AgentState = {
         "messages": messages,
         "profile": profile or {},
         "language": language,
@@ -369,5 +350,19 @@ def run_agent(messages, profile=None, language="hinglish"):
         "reply": "",
         "need_followup": False,
     }
-    final_state = agent_graph.invoke(initial_state)
-    return final_state
+
+    state = extract_info(state)
+    route = route_after_extraction(state)
+
+    if route == "ask_followup":
+        state = ask_followup(state)
+        return state
+
+    if route == "chit_chat":
+        state = chit_chat_response(state)
+        return state
+
+    # route == "match_schemes"
+    state = match_schemes_node(state)
+    state = generate_response(state)
+    return state

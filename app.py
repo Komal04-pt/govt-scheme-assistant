@@ -10,10 +10,12 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from pymongo import MongoClient
 
 from agent import run_agent
 from voice import transcribe_audio, synthesize_speech
-from eligibility import match_all_schemes, SCHEMES
+import eligibility
+from eligibility import match_all_schemes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,6 +38,25 @@ async def add_no_cache_headers(request: Request, call_next):
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
     return response
+
+MONGODB_URI = os.getenv("MONGODB_URI")
+MONGO_DB_NAME = "janseva_db"
+
+mongo_client = MongoClient(MONGODB_URI)
+mongo_db = mongo_client[MONGO_DB_NAME]
+schemes_collection = mongo_db["schemes"]
+
+def load_schemes_from_mongo():
+    docs = list(schemes_collection.find({}, {"_id": 0}))
+    return docs
+
+def refresh_schemes_cache():
+    global SCHEMES
+    SCHEMES = load_schemes_from_mongo()
+    eligibility.SCHEMES = SCHEMES
+    return SCHEMES
+
+SCHEMES = refresh_schemes_cache()
 
 SESSIONS = {}
 
@@ -115,7 +136,7 @@ def _extract_scheme_names(matched_data):
 
 @app.get("/api/schemes")
 async def get_filtered_schemes(state: str = "ALL"):
-    all_schemes = SCHEMES
+    all_schemes = load_schemes_from_mongo()
 
     if state.upper() == "ALL":
         return JSONResponse(all_schemes)
@@ -150,6 +171,7 @@ async def check_eligibility_api(request: Request):
             "annual_income": data.get("income"),
         }
 
+        refresh_schemes_cache()
         result = match_all_schemes(profile)
 
         return JSONResponse({
@@ -164,7 +186,7 @@ async def check_eligibility_api(request: Request):
 
 @app.get("/schemes.json")
 def get_schemes_json():
-    return JSONResponse(SCHEMES)
+    return JSONResponse(load_schemes_from_mongo())
 
 @app.post("/chat", response_model=ChatResponse)
 def chat(req: ChatRequest):
