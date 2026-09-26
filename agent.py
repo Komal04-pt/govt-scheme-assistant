@@ -139,7 +139,7 @@ def extract_info(state: AgentState) -> AgentState:
 
 
 def route_after_extraction(state: AgentState) -> str:
-  """Decides the next step based on message type and profile completeness."""
+    """Decides the next step based on message type and profile completeness."""
     message_type = state.get("message_type", "new_query")
 
     if state.get("named_scheme_query"):
